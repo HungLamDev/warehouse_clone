@@ -4,7 +4,7 @@ import { createTheme } from '@mui/material/styles';
 export const darkTheme = createTheme({
   palette: {
     mode: "dark",
-    background: { default: "#1c2538" },
+    background: { default: "#bbdefb" },
   },
   components: {
     MuiButtonBase: {
