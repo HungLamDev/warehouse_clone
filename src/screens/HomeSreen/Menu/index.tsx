@@ -20,7 +20,20 @@ import { useSelector } from 'react-redux';
 import chemistryIcon from "../../../assets/chemistry.png"
 import tonIcon from "../../../assets/inton.png" 
 import SoleIcon from "../../../assets/sole.png" 
-import decorateIcon from "../../../assets/decorate.png"                                                                                                                                                                                              
+import decorateIcon from "../../../assets/decorate.png"                                                                                                                                                                            
+import { ILanguageItem } from '../../LoginScreen/chooseLanguage/interface';
+import englishIcon from "../../../assets/english.png"
+import burmeseIcon from "../../../assets/burmese.png"
+import vietnameseIcon from "../../../assets/vietnamese.png"
+import chineseIcon from "../../../assets/chinese.png"
+import workerIcon from "../../../assets/worker.png"
+import addUserIcon from "../../../assets/addUser.png"
+import deleteStampIcon from "../../../assets/deleteStamp.png"
+import PermissionPrintIcon from "../../../assets/permission-print.png"
+
+
+
+
 
 const Menu = () => {
     const { t } = useTranslation();
@@ -183,7 +196,56 @@ const Menu = () => {
         }
     ]
     //danh sach ngon ngu
-
+    const myArray: ILanguageItem[] = [
+        {
+            language: t("btnEnglish"),
+            icon: englishIcon,
+            value: "EN"
+        },
+        {
+            language: t("btnChina"),
+            icon: chineseIcon,
+            value: "EN"
+        }, {
+            language: t("btnVietnames"),
+            icon: vietnameseIcon,
+            value: "EN"
+        }, {
+            language: t("tsmMyanmar"),
+            icon: burmeseIcon,
+            value: "EN"
+        }
+    ]
+    // danh sach settings
+    const listSettings: {title: string; icon: string; path:string}[] =[
+        {
+            title: t("lblDelete_Order") as string,
+            icon: deleteStampIcon,
+            path:"/delete-order"
+        },
+        {
+            title: t("btnData_Program_Proproty") as string,
+            icon: workerIcon,
+            path:"/priority-rack"
+        },
+        {
+            title: t("lblUser") as string,
+            icon: addUserIcon,
+            path:"/user-form"
+        },
+        {
+            title: t("lblDelete_Order") as string,
+            icon: PermissionPrintIcon,
+            path:"/permission-print"
+        }
+    ]
+      // Danh sách in khác
+  const listPrintOther: { title: string; icon: string; path: string, disabled?: boolean, hidden?: boolean }[] = [
+    {
+      title: t("btnPrint_Chemistry") as string,
+      icon: chemistryIcon,
+      path: "/chemistry-print",
+    },]
 }
 
 export default Menu
