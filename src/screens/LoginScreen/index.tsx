@@ -7,19 +7,6 @@ import ChooseLanguage from "./chooseLanguage";
 
 
 const LoginScreen = () => {
-
-  // useEffect(() => {
-  //   const container = document.querySelector('#login-screen');
-
-  //   if (container instanceof Element) {
-  //     const fireworks = new Fireworks(container, { autoresize: true });
-  //     fireworks.start();
-  //   } else {
-  //     console.error('Container element not found!');
-  //   }
-  // }, []); // Empty dependency array means this effect runs once after the initial render
-
-
   const { t } = useTranslation();
   return (
     <section id={"login-screen"}>

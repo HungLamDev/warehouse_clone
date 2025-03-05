@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState }  from 'react'
+import React, { useEffect, useState }  from 'react'
 import { config } from '../../../utils/api';
 import { useTranslation } from "react-i18next"
 import lhgIcon from "../../../assets/LHG.png"
@@ -8,8 +8,12 @@ import lvlIcon from "../../../assets/LYM.png"
 import lymIcon from "../../../assets/LYM.png"  
 import { get } from 'lodash';
 import { getFactory, setFactory } from '../../../utils/localStorage';
-import { Box, FormControl, MenuItem, Select, Stack, Typography } from '@mui/material';
-
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 export type FactoryName = "LHG" | "LYV" | "LVL" | "LYM";
 export interface IFactoryItem {
   factoryName: string;
@@ -58,6 +62,13 @@ const ChooseFactory = () => {
   ];
   const appFactory = getFactory() === null ? setFactory("LHG") : getFactory();
   const [selectedValue, setSelectedValue] = useState<FactoryName>(appFactory ? appFactory : "LHG");
+
+
+  useEffect(() => {
+    if (selectedValue === "LHG") {
+      connect_string = 'http://192.168.30.174:8080/'
+    }
+  })
   const handleClickItem = (lng: FactoryName)=> {
     setSelectedValue(lng)
     setFactory(lng)
