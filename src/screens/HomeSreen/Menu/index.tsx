@@ -1,40 +1,43 @@
 import Button from '@mui/material/Button';
 import colors from '@mui/material/colors';
-import React from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import importIcon from "../../../assets/import.png"
 import exportIcon from "../../../assets/export.png"
 import Analytics from "../../../assets/Analytics.png"
 import inventoryIcon from "../../../assets/inventory.png"
 import deliveryIcon from "../../../assets/delivery.png"
-import reportIcon from "../../../assets/reportIcon.png"
+import reportIcon from "../../../assets/report.png"
 import inkhacIcon from "../../../assets/inkhac.png"
 import printerIcon from "../../../assets/printer.png";
-import labelSplitIcon from "../../../assets/labelSplit.png";
+import labelSplitIcon from "../../../assets/tachnhan.png";
 import settingsIcon from "../../../assets/settings.png";
-import resetPasswordIcon from "../../../assets/resetPassword.png";
+import resetPasswordIcon from "../../../assets/reset-password.png";
 import languagesIcon from "../../../assets/languages.png"
 import SampleIcon from "../../../assets/sample.png"
 import { useSelector } from 'react-redux';
 import chemistryIcon from "../../../assets/chemistry.png"
-import tonIcon from "../../../assets/inton.png" 
-import SoleIcon from "../../../assets/sole.png" 
-import decorateIcon from "../../../assets/decorate.png"                                                                                                                                                                            
+import tonIcon from "../../../assets/inton.png"
+import SoleIcon from "../../../assets/sole.png"
+import decorateIcon from "../../../assets/decorate.png"
 import { ILanguageItem } from '../../LoginScreen/chooseLanguage/interface';
 import englishIcon from "../../../assets/english.png"
 import burmeseIcon from "../../../assets/burmese.png"
 import vietnameseIcon from "../../../assets/vietnamese.png"
 import chineseIcon from "../../../assets/chinese.png"
 import workerIcon from "../../../assets/worker.png"
-import addUserIcon from "../../../assets/addUser.png"
+import addUserIcon from "../../../assets/add-group.png"
 import deleteStampIcon from "../../../assets/deleteStamp.png"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PermissionPrintIcon from "../../../assets/permission-print.png"
-
-
-
-
-
+import { connect_string } from '../../LoginScreen/ChooseFactory';
+import LogoutIcon from '@mui/icons-material/Logout';
+import axios from 'axios';
+import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
 const Menu = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -56,11 +59,16 @@ const Menu = () => {
                     },
                 }
             }{...props}>
-
             </Button>
         )
 
     }
+    
+  const GridItem = (props: any) => {
+    return (
+      <Grid {...props} item xs={2} textAlign={"center"} color={"white"} display={"flex"} direction={'column'} alignItems={'center'} gap={'10px'}></Grid>
+    );
+  };
 
     //danh sach chuc nang
     const menuList: { title: string; icon: string; path: string, modal: boolean, modalName: string, disabled?: boolean }[] = [
@@ -118,7 +126,7 @@ const Menu = () => {
             modal: false,
             modalName: '',
 
-        },{
+        }, {
             title: t("btnERP_Print") as string,
             icon: printerIcon,
             path: "",
@@ -133,7 +141,7 @@ const Menu = () => {
             modal: false,
             modalName: '',
             disabled: dataUser[0].UserRole === 'User ' ? true : false
-            
+
 
         },
         {
@@ -141,12 +149,12 @@ const Menu = () => {
             icon: settingsIcon,
             path: "",
             modal: true,
-            modalName: '',
+            modalName: 'settings',
             disabled: dataUser[0].UserRole === 'Administrator' ? false : true
 
         },
         {
-            title: t("btnChangepasssword"),
+            title: t("btnChangepassword"),
             icon: resetPasswordIcon,
             path: "",
             modal: true,
@@ -163,38 +171,38 @@ const Menu = () => {
     ]
     //danh sach the kho
     const list: {
-        title: string; icon: string; path: string; vWareHouse:string, hidden?: boolean 
+        title: string; icon: string; path: string; vWareHouse: string, hidden?: boolean
     }[] = [
-        {
-            title: t("btnAccounting_chemistry") as string,
-            icon: chemistryIcon,
-            path: "/accounting-card",
-            vWareHouse: "No"
-        },
-        {
-            title: t("btnAccounting_sample") as string,
-            icon: SampleIcon,
-            path: "/accounting-card",
-            vWareHouse: "Sample"
-        },
-        {
-            title: t("btnAccounting_inventory") as string,
-            icon: tonIcon,
-            path: "/accounting-card",
-            vWareHouse: "inventory"
-        },
-        {
-            title: t("btnAccounting_Sole") as string,
-            icon: SoleIcon,
-            path: "/accounting-card",
-            vWareHouse: "Fitting"
-        }, {
-            title: t("btnAccounting_sample") as string,
-            icon: decorateIcon,
-            path: "/accounting-card",
-            vWareHouse: "Decorate"
-        }
-    ]
+            {
+                title: t("btnAccounting_chemistry") as string,
+                icon: chemistryIcon,
+                path: "/accounting-card",
+                vWareHouse: "No"
+            },
+            {
+                title: t("btnAccounting_sample") as string,
+                icon: SampleIcon,
+                path: "/accounting-card",
+                vWareHouse: "Sample"
+            },
+            {
+                title: t("btnAccounting_inventory") as string,
+                icon: tonIcon,
+                path: "/accounting-card",
+                vWareHouse: "inventory"
+            },
+            {
+                title: t("btnAccounting_Sole") as string,
+                icon: SoleIcon,
+                path: "/accounting-card",
+                vWareHouse: "Fitting"
+            }, {
+                title: t("btnAccounting_sample") as string,
+                icon: decorateIcon,
+                path: "/accounting-card",
+                vWareHouse: "Decorate"
+            }
+        ]
     //danh sach ngon ngu
     const myArray: ILanguageItem[] = [
         {
@@ -217,35 +225,157 @@ const Menu = () => {
         }
     ]
     // danh sach settings
-    const listSettings: {title: string; icon: string; path:string}[] =[
+    const listSettings: { title: string; icon: string; path: string }[] = [
         {
             title: t("lblDelete_Order") as string,
             icon: deleteStampIcon,
-            path:"/delete-order"
+            path: "/delete-order"
         },
         {
             title: t("btnData_Program_Proproty") as string,
             icon: workerIcon,
-            path:"/priority-rack"
+            path: "/priority-rack"
         },
         {
             title: t("lblUser") as string,
             icon: addUserIcon,
-            path:"/user-form"
+            path: "/user-form"
         },
         {
             title: t("lblDelete_Order") as string,
             icon: PermissionPrintIcon,
-            path:"/permission-print"
+            path: "/permission-print"
         }
     ]
-      // Danh sách in khác
-  const listPrintOther: { title: string; icon: string; path: string, disabled?: boolean, hidden?: boolean }[] = [
-    {
-      title: t("btnPrint_Chemistry") as string,
-      icon: chemistryIcon,
-      path: "/chemistry-print",
-    },]
+    // Danh sách in khác
+    const listPrintOther: { title: string; icon: string; path: string, disabled?: boolean, hidden?: boolean }[] = [
+        {
+            title: t("btnPrint_Chemistry") as string,
+            icon: chemistryIcon,
+            path: "/chemistry-print",
+        },]
+    const [open, setOpen] = useState(false);
+    const [modalName, setModalName] = useState('');
+    const [showPage, setShowPage] = useState(true);
+    const handleNavigate = (path: any, title: any) => {
+        const url = connect_string + 'api/CheckPoint'
+        const config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        };
+        const data = {
+            data: dataUser[0].UserId,
+            point: title,
+            get_version: dataUser[0].WareHouse
+        }
+        if (path === "/delivery-sample-lyv") {
+
+        } else {
+            setShowPage(false)
+            setTimeout(() => {
+                Navigate(path);
+            }, 1400)
+            axios.post(url, data, config)
+        }
+    }
+    const handleOpen = (name: string) => {
+        setModalName(name);
+        setOpen(true);
+
+    }
+    const handleClose = () => {
+        setOpen(false);
+        setModalName('')
+
+    }
+    const handleLogout = () => {
+        window.location.reload()
+
+    }
+
+    return (
+        <Stack
+            className={"menuContainer"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            margin={"0 auto"}>
+            <div style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                flex: 1,
+                width: "100%",
+                paddingRight: "50px",
+                paddingTop: "20px",
+            }}>
+                <Box sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    border: "1px solid",
+                    padding: "5px",
+                    borderRadius: "20px",
+                }}>
+                    <AccountCircleIcon fontSize="large" />
+                    <Stack sx={{ marginLeft: "10px", marginRight: "20px" }} >
+                        <Typography>
+                            {dataUser[0].User_Name}
+                        </Typography>
+                        <Box display="flex" justifyContent={"space-between"}>
+                            <Typography marginRight="20px" variant="subtitle2">{dataUser[0].UserId} </Typography>
+                        </Box>
+                    </Stack>
+                    <LogoutIcon
+                        sx={{
+                            cursor: 'pointer'
+                        }}
+                        onClick={handleLogout} />
+
+                </Box>
+
+            </div>
+            <Grid
+                container
+                width="80%"
+                flex={8}
+                display="flex"
+                alignContent={"center"}
+                marginTop={'50px'}
+                gap={'70px 0px'}
+                sx={{
+                    "@media screen and (max-height: 400px)": {
+                        gap: '15px 0px'
+                    },
+                }}>
+                {menuList.map(({ title, icon, path, modal, modalName, disabled }, index: number) => {
+                    return (
+                        <Grid key={index} item display={'flex'} flexDirection={'column'} textAlign={'center'} xs={2} alignItems={'center'} gap={'10px'} >
+                            <IconWrapper
+                                disabled={disabled ? disabled : false}
+                                onClick={() => {
+                                    if (modal) {
+                                        handleOpen(modalName)
+                                    }
+                                    else {
+                                        handleNavigate(path, title);
+                                    }
+                                }}
+                            >
+                                <img src={icon} alt={title} className="hover-effect" />
+                            </IconWrapper>
+                            <Typography
+                                sx={{
+                                    fontSize: '15px',
+                                    // color: '#17153B'
+                                    color: 'white'
+                                }}
+                                className="textsize-960px" >{t(title)}</Typography>
+                        </Grid>
+                    );
+                })}
+            </Grid>
+        </Stack>
+    )
 }
 
 export default Menu

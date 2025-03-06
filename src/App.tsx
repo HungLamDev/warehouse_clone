@@ -1,11 +1,19 @@
 import "./App.scss";
 import { useEffect, useState } from 'react'
 
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
 import LoginScreen from './screens/LoginScreen'
 import ErrorScreen from './screens/ErrorScreen'
+import Homesrceen from './screens/HomeSreen'
 import { useSelector } from 'react-redux'
 
+const ProtectedRoutes = ({ authenticate }: { authenticate: boolean }) => {
+
+  if (!authenticate) {
+    return <Navigate to={"/login"} replace />;
+  }
+  return <Outlet />;
+};
 function App() {
   const dataUser = useSelector((state: any) => state.UserLogin.user);
   const navigate = useNavigate();
@@ -22,6 +30,10 @@ function App() {
   return (
    <section className={"App"}>
     <Routes>
+      <Route  element={<ProtectedRoutes authenticate={authenticate} />}>
+         <Route path ="/" element={<Homesrceen/>} />
+      </Route>
+
       <Route path="/login" element={<LoginScreen />}/>
       <Route path="/*" element={<ErrorScreen />}/>
 

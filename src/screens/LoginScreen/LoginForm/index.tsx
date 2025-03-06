@@ -107,7 +107,7 @@ const LoginForm = ()  => {
                         {
                             UserId: response.data[0]['User_ID'],
                             User_Name: response.data[0]['User_Name'],
-                            UserRole: response.data[0]['RUser_Role'],
+                            UserRole: response.data[0]['Group_Name'],
                             WareHouse: selectedWareHouse,
                             factoryName: factoryName,
                             // buldingData: buldingData,
