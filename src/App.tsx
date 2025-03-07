@@ -6,6 +6,7 @@ import LoginScreen from './screens/LoginScreen'
 import ErrorScreen from './screens/ErrorScreen'
 import Homesrceen from './screens/HomeSreen'
 import { useSelector } from 'react-redux'
+import StampPrintScreen from "./screens/StampPrintScreenv2"
 
 const ProtectedRoutes = ({ authenticate }: { authenticate: boolean }) => {
 
@@ -32,6 +33,7 @@ function App() {
     <Routes>
       <Route  element={<ProtectedRoutes authenticate={authenticate} />}>
          <Route path ="/" element={<Homesrceen/>} />
+         <Route path={"/stamp-print"} element={<StampPrintScreen />}></Route>
       </Route>
 
       <Route path="/login" element={<LoginScreen />}/>

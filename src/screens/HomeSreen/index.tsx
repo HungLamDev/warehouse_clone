@@ -1,3 +1,4 @@
+import "./style.scss";
 import Menu from './Menu';
 import React from 'react'
 
