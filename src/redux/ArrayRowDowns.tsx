@@ -1,0 +1,67 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+
+export interface Stamp {
+    Arrival_QTY: number,
+    Barcode: string,
+    Color: string,
+    Label_Status: string,
+    Log_Material_Label_Serial: string,
+    Material_Label_Serial: string,
+    Material_Name: string,
+    Material_No: string,
+    Material_Type: string,
+    Modify_Date: string,
+    Order_No: string,
+    Print_Date: string,
+    Print_QTY: string,
+    Print_Times: number,
+    Production: string,
+    Program_Log: string,
+    QTY: number,
+    Roll: string,
+    Size: string,
+    Supplier: string,
+    Supplier_No: string,
+    Total_Qty: number,
+    Unit: string,
+    User_Serial_Key: string,
+    Work_Order: string
+}
+interface ArrayRowDownState {
+    items: any[]
+}
+const initialState: ArrayRowDownState = {
+    items: []
+}
+const ArrayRowDowns = createSlice({
+    name: 'ArrayRowDowns',
+    initialState,
+    reducers: {
+        addItem: (state, action: PayloadAction<any>) => {
+            state.items.push(action.payload);
+        },
+        copyValues: (state, action: PayloadAction<any[]>) => {
+            state.items = [...action.payload];
+        },
+        removeItemByBarcode: (state, action: PayloadAction<string>) => {
+            const barcodeToRemove = action.payload;
+            state.items = state.items.filter(item => item.Barcode !== barcodeToRemove);
+        },
+        clearArrayRowDowns: (state) => {
+            state.items = [];
+        },
+        TextFieldChangeArrayRowDowns: (state, action: PayloadAction<{ _id: number, columnName: string,value: any }>) => {
+            const { _id,columnName, value } = action.payload;
+            state.items[_id][columnName] = value;
+        },
+        DateTimePickerChangeArrayRowDowns: (state, action: PayloadAction<{ _id: number, columnName: string,value: any }>) => {
+            const { _id,columnName, value } = action.payload;
+            state.items[_id][columnName] = value;
+        }
+
+    }
+
+})
+export const { addItem, copyValues, removeItemByBarcode, clearArrayRowDowns, TextFieldChangeArrayRowDowns,DateTimePickerChangeArrayRowDowns } = ArrayRowDowns.actions;
+
+export default ArrayRowDowns.reducer;   
