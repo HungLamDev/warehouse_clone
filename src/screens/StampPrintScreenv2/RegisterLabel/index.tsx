@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { BiBorderRadius } from 'react-icons/bi';
+import InputFieldV1 from '../../../components/InputField/index_new';
 const RegisterLabel = () => {
 
   const { t } = useTranslation();
@@ -27,7 +28,19 @@ const RegisterLabel = () => {
             gap: '10px'
           }}>
           <Grid container width={'80%'} rowGap={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Grid item xs={6}></Grid>
+            <Grid item xs={6}>
+            <InputFieldV1
+            
+                                focus={true}
+                                label={t("dcmOrder_No") as string}
+                                value={orderNo}
+                                handle={handleOrderNo}
+                                keydown={null}
+                                disable={disable}
+                                xsLabel={5.5}
+                                xsInput={5.5}
+                            />
+            </Grid>
             <Grid item xs={6}></Grid>
             <Grid item xs={6}></Grid>
             <Grid item xs={6}></Grid>
