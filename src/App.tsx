@@ -1,6 +1,5 @@
 import "./App.scss";
 import { useEffect, useState } from 'react'
-
 import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
 import LoginScreen from './screens/LoginScreen'
 import ErrorScreen from './screens/ErrorScreen'

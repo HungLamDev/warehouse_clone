@@ -9,7 +9,7 @@ const defaultConfig = {
     }
 }
 
-export const createConfog = (signal:any) => {
+export const createConfig = (signal:any) => {
     return {
         ...defaultConfig,
         signal: signal

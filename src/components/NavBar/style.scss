@@ -1,0 +1,27 @@
+.my-navbar {
+  .back-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1dvw;
+  }
+
+  .sidebar-toggle-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 1dvw;
+  }
+
+  .titleNavbar {
+    font-size: 2rem;
+
+    @media screen and (max-width: 1200px) {
+      font-size: 1.7rem;
+    }
+
+    @media screen and (max-width: 800px) {
+      font-size: 1.5rem;
+    }
+  }
+}
