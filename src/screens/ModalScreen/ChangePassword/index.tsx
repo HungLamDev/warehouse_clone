@@ -94,7 +94,7 @@ const ChangePassword = ({ open, onClose }: { open?: any, onClose?: any }) => {
                 setTxtStatus(t("msgChangePassword") as string)
                 setOpenConfirm(true)
             }
-        }) .catch(error => {
+        }).catch(error => {
             console.error("Lỗi API:", error);
             setTxtStatus("Có lỗi xảy ra, vui lòng thử lại.");
             setOpenConfirm(true);
@@ -252,8 +252,8 @@ const ChangePassword = ({ open, onClose }: { open?: any, onClose?: any }) => {
                                     </TextField>
                                 </Grid>
                                 <Grid xs={12} display={'flex'} justifyContent={'center'} >
-                                        <MyButton name={t('btnSave') as string} onClick={handleSave} />
-                                    </Grid>
+                                    <MyButton name={t('btnSave') as string} onClick={handleSave} />
+                                </Grid>
                             </Grid>
 
 

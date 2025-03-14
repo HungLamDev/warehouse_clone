@@ -14,7 +14,7 @@ import moment from 'moment';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import DatePickerFieldV1 from '../../../components/DatePickerField/index_new';
-import { styletext } from '../../../components/StockinScreenv2/StockinForm';
+import { styletext } from '../../StockinScreenv2/StockinForm';
 import MyButton from '../../../components/MyButton';
 const RegisterLabel = () => {
 

@@ -78,144 +78,144 @@ const Menu = () => {
     // Danh sách các chức năng trong menu
     const menuList: { title: string; icon: string; path: string, modal: boolean, modalName: string, disabled?: boolean }[] = [
         {
-          title: t("btnStock_In") as string,
-          icon: importIcon,
-          path: "/stock-in",
-          modal: false,
-          modalName: '',
+            title: t("btnStock_In") as string,
+            icon: importIcon,
+            path: "/stock-in",
+            modal: false,
+            modalName: '',
         },
         {
-          title: t("btnStock_Out") as string,
-          icon: exportIcon,
-          path: "/stock-out",
-          modal: false,
-          modalName: '',
+            title: t("btnStock_Out") as string,
+            icon: exportIcon,
+            path: "/stock-out",
+            modal: false,
+            modalName: '',
         },
         {
-          title: t("lblSystem_Warehouse") as string,
-          icon: Analytics,
-          path: "/warehouse",
-          modal: false,
-          modalName: '',
+            title: t("lblSystem_Warehouse") as string,
+            icon: Analytics,
+            path: "/warehouse",
+            modal: false,
+            modalName: '',
         },
         {
-          title: t("btnInventory") as string,
-          icon: inventoryIcon,
-          path: "/inventory",
-          modal: false,
-          modalName: '',
+            title: t("btnInventory") as string,
+            icon: inventoryIcon,
+            path: "/inventory",
+            modal: false,
+            modalName: '',
         },
         {
-          title: (dataUser[0].WareHouse === 'Sample' && dataUser[0].factoryName === 'LYV') ? t("btnDeliverySample") : t("btnDelivery"),
-          icon: deliveryIcon,
-          path: (dataUser[0].WareHouse === 'Sample' && dataUser[0].factoryName !== 'LYV') ? "/delivery-sample" : (dataUser[0].WareHouse === 'Sample' && dataUser[0].factoryName === 'LYV') ? "/delivery-sample-lyv" : "/delivery",
-          modal: false,
-          modalName: '',
+            title: (dataUser[0].WareHouse === 'Sample' && dataUser[0].factoryName === 'LYV') ? t("btnDeliverySample") : t("btnDelivery"),
+            icon: deliveryIcon,
+            path: (dataUser[0].WareHouse === 'Sample' && dataUser[0].factoryName !== 'LYV') ? "/delivery-sample" : (dataUser[0].WareHouse === 'Sample' && dataUser[0].factoryName === 'LYV') ? "/delivery-sample-lyv" : "/delivery",
+            modal: false,
+            modalName: '',
         },
         {
-          title: t("btnAccounting_Card") as string,
-          icon: reportIcon,
-          path: dataUser[0].WareHouse === 'Fitting' ? "/accountingcard-sole" : "/accounting-card",
-          modal: dataUser[0].UserRole === 'Administrator' || dataUser[0].UserRole === 'Manager' || dataUser[0].UserRole === 'Account' ? true : false,
-          modalName: 'listAccounting_Card',
+            title: t("btnAccounting_Card") as string,
+            icon: reportIcon,
+            path: dataUser[0].WareHouse === 'Fitting' ? "/accountingcard-sole" : "/accounting-card",
+            modal: dataUser[0].UserRole === 'Administrator' || dataUser[0].UserRole === 'Manager' || dataUser[0].UserRole === 'Account' ? true : false,
+            modalName: 'listAccounting_Card',
         },
         {
-          title: t("btnPrint_Other") as string,
-          icon: inkhacIcon,
-          path: "",
-          modal: true,
-          modalName: 'print_other',
-          disabled: dataUser[0].UserRole === 'User ' ? true : false
+            title: t("btnPrint_Other") as string,
+            icon: inkhacIcon,
+            path: "",
+            modal: true,
+            modalName: 'print_other',
+            disabled: dataUser[0].UserRole === 'User ' ? true : false
         },
         {
-          title: t("btnERP_Print") as string,
-          icon: printerIcon,
-          path: "/stamp-print",
-          modal: false,
-          modalName: '',
-          disabled: dataUser[0].UserRole === 'User ' ? true : false
+            title: t("btnERP_Print") as string,
+            icon: printerIcon,
+            path: "/stamp-print",
+            modal: false,
+            modalName: '',
+            disabled: dataUser[0].UserRole === 'User ' ? true : false
         },
         {
-          title: t("lblSM_Print_Cut"),
-          icon: labelSplitIcon,
-          path: "/label-split",
-          modal: false,
-          modalName: '',
-          disabled: dataUser[0].UserRole === 'User ' ? true : false
+            title: t("lblSM_Print_Cut"),
+            icon: labelSplitIcon,
+            path: "/label-split",
+            modal: false,
+            modalName: '',
+            disabled: dataUser[0].UserRole === 'User ' ? true : false
         },
         {
-          title: t("lblSetting"),
-          icon: settingsIcon,
-          path: "",
-          modal: true,
-          modalName: 'settings',
-          disabled: dataUser[0].UserRole === 'Administrator' ? false : true
+            title: t("lblSetting"),
+            icon: settingsIcon,
+            path: "",
+            modal: true,
+            modalName: 'settings',
+            disabled: dataUser[0].UserRole === 'Administrator' ? false : true
         },
         {
-          title: t("btnChangepassword"),
-          icon: resetPasswordIcon,
-          path: "",
-          modal: true,
-          modalName: 'change-password',
+            title: t("btnChangepassword"),
+            icon: resetPasswordIcon,
+            path: "",
+            modal: true,
+            modalName: 'change-password',
         },
         {
-          title: t("tsmLanguage"),
-          icon: languagesIcon,
-          path: "",
-          modal: true,
-          modalName: 'languages',
+            title: t("tsmLanguage"),
+            icon: languagesIcon,
+            path: "",
+            modal: true,
+            modalName: 'languages',
         },
-      ];
+    ];
 
     // Danh sách thẻ kho
     const list: {
         title: string; icon: string; path: string; vWareHouse: string, hidden?: boolean
     }[] = [
-        {
-            title: t("btnAccounting_Chemistry") as string,
-            icon: chemistryIcon,
-            path: "/accounting-card",
-            vWareHouse: "No"
-        },
-        {
-            title: t("btnAccounting_Sample") as string,
-            icon: SampleIcon,
-            path: "/accounting-card",
-            vWareHouse: "Sample"
-        },
-        {
-            title: t("btnAccounting_Inventory") as string,
-            icon: tonIcon,
-            path: "/accounting-card",
-            vWareHouse: "inventory"
-        },
-        {
-            title: t("btnAccounting_Sole") as string,
-            icon: SoleIcon,
-            path: "/accounting-card",
-            vWareHouse: "Fitting"
-        },
-        {
-            title: t("btnAccounting_Decorate") as string,
-            icon: decorateIcon,
-            path: "/accounting-card",
-            vWareHouse: "Decorate"
-      
-          },
-          {
-            title: t("btnAccounting_FOC") as string,
-            icon: focIcon,
-            path: "/accounting-card",
-            vWareHouse: "FOC",
-            hidden: dataUser[0].factoryName === "LHG" ? false : true
-          },
-          {
-            title: t("btnAccounting_Card") as string,
-            icon: reportIcon,
-            path: "/accounting-card",
-            vWareHouse: "No"
-          },
-    ]
+            {
+                title: t("btnAccounting_Chemistry") as string,
+                icon: chemistryIcon,
+                path: "/accounting-card",
+                vWareHouse: "No"
+            },
+            {
+                title: t("btnAccounting_Sample") as string,
+                icon: SampleIcon,
+                path: "/accounting-card",
+                vWareHouse: "Sample"
+            },
+            {
+                title: t("btnAccounting_Inventory") as string,
+                icon: tonIcon,
+                path: "/accounting-card",
+                vWareHouse: "inventory"
+            },
+            {
+                title: t("btnAccounting_Sole") as string,
+                icon: SoleIcon,
+                path: "/accounting-card",
+                vWareHouse: "Fitting"
+            },
+            {
+                title: t("btnAccounting_Decorate") as string,
+                icon: decorateIcon,
+                path: "/accounting-card",
+                vWareHouse: "Decorate"
+
+            },
+            {
+                title: t("btnAccounting_FOC") as string,
+                icon: focIcon,
+                path: "/accounting-card",
+                vWareHouse: "FOC",
+                hidden: dataUser[0].factoryName === "LHG" ? false : true
+            },
+            {
+                title: t("btnAccounting_Card") as string,
+                icon: reportIcon,
+                path: "/accounting-card",
+                vWareHouse: "No"
+            },
+        ]
 
     // Danh sách ngôn ngữ
     const myArray: ILanguageItem[] = [
@@ -227,17 +227,17 @@ const Menu = () => {
         {
             language: t("btnChina"),
             icon: chineseIcon,
-            value: "EN"
+            value: "TW"
         },
         {
             language: t("btnVietnames"),
             icon: vietnameseIcon,
-            value: "EN"
+            value: "VN"
         },
         {
             language: t("tsmMyanmar"),
             icon: burmeseIcon,
-            value: "EN"
+            value: "MM"
         }
     ]
 
@@ -268,47 +268,47 @@ const Menu = () => {
     // Danh sách in khác
     const listPrintOther: { title: string; icon: string; path: string, disabled?: boolean, hidden?: boolean }[] = [
         {
-          title: t("btnPrint_Chemistry") as string,
-          icon: chemistryIcon,
-          path: "/chemistry-print",
+            title: t("btnPrint_Chemistry") as string,
+            icon: chemistryIcon,
+            path: "/chemistry-print",
         },
         {
-          title: t("btnPrint_sample") as string,
-          icon: inblaIcon,
-          path: "/sample-print",
+            title: t("btnPrint_sample") as string,
+            icon: inblaIcon,
+            path: "/sample-print",
         },
         {
-          title: t("btnPrint_Inventory") as string,
-          icon: intonIcon,
-          path: "/inventory-print",
-          disabled: dataUser[0].UserRole === 'Administrator' || dataUser[0].UserRole === 'Manager' || dataUser[0].UserRole === 'InPartial' || dataUser[0].UserRole === 'Inventory' ? false : true
+            title: t("btnPrint_Inventory") as string,
+            icon: intonIcon,
+            path: "/inventory-print",
+            disabled: dataUser[0].UserRole === 'Administrator' || dataUser[0].UserRole === 'Manager' || dataUser[0].UserRole === 'InPartial' || dataUser[0].UserRole === 'Inventory' ? false : true
         },
         {
-          title: t("btnPrintRack_QRcode") as string,
-          icon: qrcanIcon,
-          path: "/shelve-code",
+            title: t("btnPrintRack_QRcode") as string,
+            icon: qrcanIcon,
+            path: "/shelve-code",
         },
         {
-          title: t("btnPrint_Decorate") as string,
-          icon: decorateIcon,
-          path: "/decorate-print",
+            title: t("btnPrint_Decorate") as string,
+            icon: decorateIcon,
+            path: "/decorate-print",
         },
         {
-          title: t("btnPrint_FOC") as string,
-          icon: focIcon,
-          path: "/foc-print",
-          hidden: dataUser[0].factoryName === "LHG" ? false : true
+            title: t("btnPrint_FOC") as string,
+            icon: focIcon,
+            path: "/foc-print",
+            hidden: dataUser[0].factoryName === "LHG" ? false : true
         },
         {
-          title: t("btnData_History_Print") as string,
-          icon: lsinIcon,
-          path: "/history-print",
+            title: t("btnData_History_Print") as string,
+            icon: lsinIcon,
+            path: "/history-print",
         },
-      ];
+    ];
 
     const [open, setOpen] = useState(false);
     const [modalName, setModalName] = useState('');
-
+    const [showPage, setShowPage] = useState(true);
     // Hàm điều hướng
     const handleNavigate = (path: string) => {
         navigate(path);
@@ -408,6 +408,9 @@ const Menu = () => {
                 })}
             </Grid>
             {modalName === 'change-password' && <ChangePassword open={open} onClose={() => setOpen(false)} />}
+            {/* Modal danh sách ngôn ngữ */}
+            {modalName === 'languages' && <ModalChoose setShowState={() => setShowPage(false)} open={open} onClose={() => setOpen(false)} array={myArray} />}
+
             {modalName === 'listAccounting_Card' && <ModalChoose open={open} onClose={() => setOpen(false)} array={list} />}
         </Stack>
     )
