@@ -66,7 +66,7 @@ const ChooseFactory = () => {
 
   useEffect(() => {
     if (selectedValue === "LHG") {
-      connect_string = 'http://192.168.30.174:8080/'
+      connect_string = 'http://192.168.30.100:8989/'
     }
   })
   const handleClickItem = (lng: FactoryName)=> {

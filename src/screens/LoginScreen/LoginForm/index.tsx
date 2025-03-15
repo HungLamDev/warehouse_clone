@@ -76,7 +76,7 @@ const LoginForm = ()  => {
 
     async function handleSubmit(event: any): Promise<void> {
         event.preventDefault();
-        const url = connect_string + "api/getuser";
+        const url = connect_string + "api/Login";
         const url_Login_Boss = connect_string + "api/Login_Boss"
         const config = {
           headers: {
@@ -85,8 +85,8 @@ const LoginForm = ()  => {
         };
     
         const dataUser = {
-            User_ID: username,
-            User_Password: password,
+            User_Id: username,
+            pass: md5(password).toUpperCase(),
         };
         const dataUserBoss = {
           User_Id: username,
@@ -100,14 +100,16 @@ const LoginForm = ()  => {
         setIsLoading(true);
         try {
             const response = await axios.post(url, dataUser, config);
+        console.log("response user:", response); // Log factoryName
+            
             if (response.data.length !== 0) {
                 // const buldingData = await showBuliding();
                 dispatch(
                     addUser([
                         {
-                            UserId: response.data[0]['User_ID'],
-                            User_Name: response.data[0]['User_Name'],
-                            UserRole: response.data[0]['Group_Name'],
+                            UserId: response.data[0]['Rp_User_Id'],
+                            UserName: response.data[0]['Rp_User_name'],
+                            UserRole: response.data[0]['Rp_Usere_level'],
                             WareHouse: selectedWareHouse,
                             factoryName: factoryName,
                             // buldingData: buldingData,

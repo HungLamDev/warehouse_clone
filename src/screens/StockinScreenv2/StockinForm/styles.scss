@@ -1,0 +1,50 @@
+.btn {
+    border: 2px solid white !important;
+    border-radius: 15px !important;
+    color: white !important;
+    background-color: #1c2538 !important;
+    padding: 10px !important;
+    width: 120px !important;
+    font-size: 11px !important;
+
+    &:hover {
+        background-color: cornflowerblue !important;
+    }
+}
+
+.text {
+    color: white !important;
+
+}
+
+.custom-header {
+    font-weight: bold;
+    color: aqua;
+    font-size: 18px;
+    font-weight: bold;
+
+}
+
+.btn-center {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+
+.btn-stockin {
+    @media screen and (max-width: 1005px) {
+        width: 5.0rem !important
+    }
+    @media screen and (max-width: 885px) {
+        width: 4.0rem !important
+    }
+
+    @media screen and (max-width: 670px) {
+        width: 3.5rem !important
+    }
+
+    @media screen and (max-width: 620px) {
+        width: 3.2rem !important
+    }
+}

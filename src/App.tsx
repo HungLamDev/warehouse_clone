@@ -4,6 +4,8 @@ import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom'
 import LoginScreen from './screens/LoginScreen'
 import ErrorScreen from './screens/ErrorScreen'
 import Homesrceen from './screens/HomeSreen'
+import Stockin from './screens/StockinScreenv2/StockinForm'
+
 import { useSelector } from 'react-redux'
 import StampPrintScreen from "./screens/StampPrintScreenv2"
 import RegisterLabel from "./screens/StampPrintScreenv2/RegisterLabel"
@@ -34,6 +36,7 @@ function App() {
       <Route  element={<ProtectedRoutes authenticate={authenticate} />}>
          <Route path ="/" element={<Homesrceen/>} />
          <Route path={"/stamp-print"} element={<StampPrintScreen />}></Route>
+         <Route path={"/stock-in"} element={<Stockin />}></Route> 
          <Route path={"/register-label"} element={<RegisterLabel />}></Route>
       </Route>
 
