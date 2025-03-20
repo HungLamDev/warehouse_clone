@@ -34,3 +34,5 @@ const ArrayDeleteAndPrint = createSlice({
 
     export const { coppyValuesArrayDeleteAndPrint ,removeItemByBarcodeArrayDeleteAndPrint , clearArrayDeleteAndPrint ,changeItemsByBarcodeArrayDeleteAndPrint } = ArrayDeleteAndPrint.actions
     export default ArrayDeleteAndPrint.reducer
+
+ 
