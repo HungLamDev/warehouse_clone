@@ -11,7 +11,7 @@ const InputField = ({ label, value, handle, keydown, type, disable, customClass,
         if (focus) {
             textFieldRef.current.focus();
         }
-    })
+    },[focus])
     return (
         <Stack
             direction={"row"}

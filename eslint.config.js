@@ -23,6 +23,7 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+       "react/no-inline-styles": "off"
     },
   },
 )

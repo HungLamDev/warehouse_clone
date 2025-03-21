@@ -7,12 +7,12 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   server: {
     host: true,
-    https: false,
+    https: true,
   },
   base: "./",
   plugins: [
     react(),
-    //mkcert(),
+    mkcert(),
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: 'auto',

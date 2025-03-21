@@ -472,6 +472,7 @@ const StampPrintScreen = () => {
     }
 
     const handleDoubleClick = (name: any, params: any) => {
+        console.log("hung " , params)
         if (isApi === true) {
             if ((params.ngay !== "1975-04-30") && (params.ngay !== "1945-02-09")) {
                 const date_temp = params.ngay.toString().replaceAll("/", "-").split('-')
@@ -479,6 +480,7 @@ const StampPrintScreen = () => {
                 setIsApi(false)
                 setIsLoading(true)
                 setDisable(true)
+                console.log("hung")
                 const url1 = connect_string + 'api/Divide_stamp'
                 const data_stamp = {
                     Order_No: params.CGNO_Order_No,
@@ -510,6 +512,8 @@ const StampPrintScreen = () => {
 
                 }
                 axios.post(url1, data_stamp, configNew).then(response => {
+                    console.log("res",response)
+    
                     setDataInRowUps(dataInRowUps1 => {
                         const newDataInRowUps = response.data.map((item: any, index: any) => {
                             return {
@@ -560,8 +564,6 @@ const StampPrintScreen = () => {
                 handleOpenConfirm("no-date")
             }
         }
-
-
     }
 
     const handleRefresh = () => {

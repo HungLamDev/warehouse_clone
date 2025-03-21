@@ -27,7 +27,7 @@ const LoginForm = ()  => {
 
     const currencies = [
         { value: 'No', label: t('massWarehouse') },
-        { value: 'sample', label: t('btnAccounting_Sample') },
+        { value: 'Sample', label: t('btnAccounting_Sample') },
         { value: 'Fitting', label: t('btnAccounting_Sole') },
         { value: 'Inventory', label: t('btnAccounting_Inventory') },
         { value: 'Decorate', label: t('btnAccounting_Decorate') },

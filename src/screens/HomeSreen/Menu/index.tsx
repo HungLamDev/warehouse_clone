@@ -356,7 +356,7 @@ const Menu = () => {
                     <AccountCircleIcon fontSize="large" />
                     <Stack sx={{ marginLeft: "10px", marginRight: "20px" }} >
                         <Typography>
-                            {dataUser[0].User_Name}
+                            {dataUser[0].UserName}
                         </Typography>
                         <Box display="flex" justifyContent={"space-between"}>
                             <Typography marginRight="20px" variant="subtitle2">{dataUser[0].UserId} </Typography>
