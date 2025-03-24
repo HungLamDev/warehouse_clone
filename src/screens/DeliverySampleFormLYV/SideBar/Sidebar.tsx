@@ -8,6 +8,8 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import GenericAutocomplete from "../../../components/GenericAutocomplete";
 import MyButton from "../../../components/MyButton";
 import MyTableNew from "../../../components/MyTableNew";
+import InputFieldV1 from "../../../components/InputField/index_new";
+import CreateMergeBom from "../CreateMergeBOMForm";
 interface SidebarProps {
 	column: any;
 	columnOutSource: any;
@@ -69,11 +71,59 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 	const [PoOutsource, setPoOutsource] = useState<any>(null)
 	const [listDataWaiting, setListDataWaiting] = useState<any[]>([])
 	const [infoPO, setInfoPO] = useState<any>({})
-
+	const [onFocus, setOnFocus] = useState(false)
+	const [PoNo, setPoNo] = useState("")
+	const [listSampleOrder, setListSampleOrder] = useState<any[]>([])
+	const [valueAutocomplete, setValueAutocomplete] = useState<any>(null);
 	const refreshData = async () => { };
 	const refreshGetDataWatingOutSource = async () => { };
 	const refreshMaterial_Stock_Out_Sample = async () => { };
 	const refreshMaterial_Stock_Out_Sample_Outsource = async () => { };
+	const [openCreateBOM, setOpenCreateBOM] = useState(false);
+	const listChooseMaterial = [
+		{
+			value: "all",
+			title: t("chxAll")
+		},
+		{
+			value: "lieu_don",
+			title: t("lblSingleMaterials")
+		},
+		{
+			value: "lieu_gia_cong",
+			title: t("lblOutsourceMaterials")
+		},
+	]
+
+	const [valueChooseMaterial, setValueChooseMaterial] = useState({
+		value: "all",
+		title: t("chxAll")
+	})
+
+	const listChooseWarehouse = [
+		{
+			value: "all",
+			title: t("chxAll")
+		},
+		{
+			value: "da-vai-pu",
+			title: t("lblLeather-Fabric-PU")
+		},
+		{
+			value: "may-baobi",
+			title: t("lblSewing-Packaging")
+		},
+		{
+			value: "kho_de",
+			title: t("lblSoleWarehouse")
+		},
+	]
+
+	const [valueChooseWarehouse, setValueChooseWarehouse] = useState({
+		value: "all",
+		title: t("chxAll")
+	})
+	
 	const refreshLoadDataJGNO = async () => {
 		return []
 	};
@@ -106,9 +156,25 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 			return false
 		}
 		return true
+	}
+	const handlePoNoChange = () => {
 
 	}
 
+	const getDataWaitingAndgetInfoPO = async (value: any) => {
+		setDisable(true)
+
+		// await handleGetNewVersion(value)
+		// Promise.all([await getDataWaiting(value), await get_Material_Stock_Out_Sample(value)]).finally(() => {
+		// 	setDisable(false)
+		// })
+	};
+	const getDataWaitingAndgetInfoPOOutSource = async (value: any) => {
+
+	}
+	const get_Material_Stock_Out_Sample_Outsource = async (value: any ) => {
+
+	}
 
 	return (
 		<div className={`sidebar ${isOpen ? "open" : "closed"}`}>
@@ -145,11 +211,7 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 				>
 					<Stack direction={"row"} height={"100%"} alignItems={"flex-end"}>
 						<Stack width={"100%"} padding={0.5}>
-							<Grid
-								container
-								columnSpacing={1}
-								rowSpacing={0.5}
-								justifyContent={"center"}
+							<Grid container columnSpacing={1} rowSpacing={0.5} justifyContent={"center"}
 							>
 								<Grid
 									item
@@ -164,24 +226,119 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 									display={"flex"}
 									justifyContent={"center"}
 									alignItems={"center"}
-								></Grid>
+								> <span className='textsize' style={{ color: 'yellow', overflow: "hidden", textOverflow: "ellipsis" }}> {infoPO?.KFJD ? "Article: " + infoPO.KFJD : ""}</span></Grid>
 								<Grid
 									item
 									xs={3}
 									display={"flex"}
 									justifyContent={"center"}
 									alignItems={"center"}
-								></Grid>
-								<Grid item xs={6} display={"flex"}></Grid>
+								> {/* Pairs */}
+									<span className='textsize' style={{ color: 'yellow', overflow: "hidden", textOverflow: "ellipsis" }}> {infoPO?.PAIRS ? "Pairs: " + infoPO.PAIRS : ""}</span></Grid>
+								<Grid item xs={6} display={"flex"}>
+									{/* Quét PO */}
+									<InputFieldV1
+										xsLabel={4}
+										xsInput={8}
+										label={t("gpbScan") as string}
+										disable={disable}
+										value={PoNo}
+										onFocus={onFocus}
+										handle={handlePoNoChange}
+										id='scan-po'
+										handleOnFocus={() => handleFocusInput('scan-po')}
+									/>
+								</Grid>
 								<Grid
 									container
 									item
 									xs={6}
 									display={"flex"}
 									alignItems={"center"}
-								></Grid>
-								<Grid item xs={3} display={"flex"} alignItems={"center"}></Grid>
-								<Grid item xs={3} display={"flex"} alignItems={"center"}></Grid>
+								>
+									{/* List PO */}
+									<Grid item display={'flex'} xs={3}>
+										<span className='textsize'>PO NO</span>
+									</Grid>
+									<Grid item display={'flex'} xs={9}>
+										<GenericAutocomplete
+											options={Array.isArray(listSampleOrder) ? listSampleOrder : []}
+											value={valueAutocomplete || ""}
+											onChange={(newValue: any | null) => {
+												if (newValue !== null) {
+													setValueAutocomplete(newValue);
+													getDataWaitingAndgetInfoPO(newValue)
+												}
+											}}
+
+											getOptionLabel={(option) =>
+												typeof option === "string" ? option : option.PONO || ""
+											}
+											isOptionEqualToValue={(option, value) => {
+												if (typeof value === 'string') {
+													return option.TestNo === value;
+												}
+												return option.TestNo === value?.TestNo;
+											}}
+										/>
+									</Grid>
+								</Grid>
+								<Grid item xs={3} display={"flex"} alignItems={"center"}>
+									{/* Chọn kho */}
+									<GenericAutocomplete
+										options={listChooseWarehouse}
+										value={valueChooseWarehouse}
+										onChange={(newValue: any | "") => {
+											if (newValue === null) {
+												setValueChooseWarehouse({
+													value: "all",
+													title: t("chxAll")
+												})
+											}
+											else {
+												setValueChooseWarehouse(newValue || "")
+											}
+										}}
+
+										getOptionLabel={(option) =>
+											typeof option === "string" ? option : option.title
+										}
+										isOptionEqualToValue={(option, value) => {
+											if (typeof value === 'string') {
+												return option.title === value;
+											}
+											return option.title === value.title;
+										}}
+									/>
+								</Grid>
+								<Grid item xs={3} display={"flex"} alignItems={"center"}>
+									{/* Chọn loại vật tư */}
+									<GenericAutocomplete
+										options={listChooseMaterial}
+										value={valueChooseMaterial}
+										onChange={(newValue: any | "") => {
+											if (newValue === null) {
+												setValueChooseMaterial({
+													value: "all",
+													title: t("chxAll")
+												})
+											}
+											else {
+												setValueChooseMaterial(newValue || "")
+											}
+										}}
+
+										getOptionLabel={(option) =>
+											typeof option === "string" ? option : option.title
+										}
+										isOptionEqualToValue={(option, value) => {
+											if (typeof value === 'string') {
+												return option.title === value;
+											}
+											return option.title === value.title;
+										}}
+									/>
+								</Grid>
 								<Grid
 									container
 									item
@@ -193,7 +350,27 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 										<span className="textsize">JGNO</span>
 									</Grid>
 									<Grid item display={"flex"} xs={9}>
-										{/* <GenericAutocomplete /> */}
+										<GenericAutocomplete
+											options={listDataWaitingOutsource || []}
+											value={PoOutsource}
+											onChange={(newValue: any | null) => {
+												setPoOutsource(newValue?.JGNO || null);
+												JGNO(newValue?.JGNO || null)
+												JGNO_Check(newValue || null)
+												getDataWaitingAndgetInfoPOOutSource(newValue?.JGNO || null)
+												get_Material_Stock_Out_Sample_Outsource(newValue?.JGNO || null)
+											}}
+
+											getOptionLabel={(option) =>
+												typeof option === "string" ? option : option.JGNO
+											}
+											isOptionEqualToValue={(option, value) => {
+												if (typeof value === 'string') {
+													return option.JGNO === value;
+												}
+												return option.JGNO === value?.JGNO;
+											}}
+										/>
 									</Grid>
 								</Grid>
 								<Grid
@@ -201,7 +378,7 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 									item
 									xs={12}
 									display={"flex"}
-									alignItems={"center"}
+									justifyContent={"center"}
 									gap={"20px"}
 								>
 									{/* Nút tim kiem */}
@@ -223,8 +400,10 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 										<MyButton
 											height="2rem"
 											name={t("btnCreateBOM")}
+											onClick={() => setOpenCreateBOM(true)}
 											disabled={disable}
 										/>
+										{openCreateBOM && <CreateMergeBom open={openCreateBOM} onClose={() => setOpenCreateBOM(false)} />}
 									</Grid>
 									{/* Nút In mẫu */}
 									<Grid item xs={2} display={"flex"} alignItems={"center"}>
