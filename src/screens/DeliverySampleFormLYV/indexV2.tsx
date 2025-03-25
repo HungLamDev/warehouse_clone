@@ -21,7 +21,7 @@ const DeliverySampleLYVScreen = () => {
 	const { t } = useTranslation();
 	const location = useLocation();
 	const stockout = location.state && location.state.data;
-
+	console.log("stockout:", stockout);
 	const [open, setOpen] = useState(false)
 	const [modalName, setModalName] = useState('')
 	const [valuetotal, setValueTotal] = useState('')
@@ -82,7 +82,7 @@ const DeliverySampleLYVScreen = () => {
 			width: 150,
 		},
 		{
-			field: "Barcode",
+			field: "barcode",
 			headerName: "Barcode",
 			align: "center",
 			headerAlign: 'center',
@@ -380,7 +380,7 @@ const DeliverySampleLYVScreen = () => {
 
 		},
 	];
-
+4
 
 	const handleFocus = (id: string) => {
 		setFocusedInputId(id);
@@ -409,11 +409,26 @@ const DeliverySampleLYVScreen = () => {
 
 		return "white"
 	};
+	// xử lý tô màu xanh vs nhưng qrcode đã tạo phiếu xuất
 	const highlightText = (item: any, row: any) => {
+		console.log("row", row)
+		console.log("item",item)
 		if (typeof item !== "string") {
 			return item;
 		}
-	}
+
+		// Kiểm tra nếu `Barcode` chứa dấu '*'
+		const isHighlighted = row?.Barcode?.includes("*");
+
+		return (
+			<span style={{ color: isHighlighted ? "lightgreen" : "inherit" }}>
+				{item.replace(/\*/g, "")} {/* Loại bỏ dấu '*' khi hiển thị */}
+			</span>
+		);
+
+	};
+
+	
 	const handleGet_qty_out_Sample = (value: any, Material_No: any) => {
 	}
 	const handleDoubleClick = async (params: any, item: any) => {
@@ -575,6 +590,7 @@ const DeliverySampleLYVScreen = () => {
 										/>
 									)
 							}
+							
 							<Stack alignItems={'flex-end'} paddingRight={'10px'} paddingLeft={'10px'} flexDirection={"row"}>
 								<Stack width={"50%"} alignItems={"flex-start"}>
 									{
