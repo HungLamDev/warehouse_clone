@@ -80,10 +80,6 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 	const [PoNo, setPoNo] = useState("")
 	const [listSampleOrder, setListSampleOrder] = useState<any[]>([])
 	const [valueAutocomplete, setValueAutocomplete] = useState<any>(null);
-	const refreshData = async () => { };
-	const refreshGetDataWatingOutSource = async () => { };
-	const refreshMaterial_Stock_Out_Sample = async () => { };
-	const refreshMaterial_Stock_Out_Sample_Outsource = async () => { };
 	const [openCreateBOM, setOpenCreateBOM] = useState(false);
 	const [testNoPoNo, setTestNoPoNo] = useState<any>({})
 	const [mergeNo, setMergeNo] = useState<any>("")
@@ -132,6 +128,27 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 		title: t("chxAll")
 	})
 	
+
+	const refreshData = async () => {
+		await getDataWaiting(valueAutocomplete);
+	};
+
+	const refreshMaterial_Stock_Out_Sample = async () => {
+		await get_Material_Stock_Out_Sample(valueAutocomplete)
+	};
+
+	const refreshMaterial_Stock_Out_Sample_Outsource = async () => {
+		await get_Material_Stock_Out_Sample_Outsource(PoOutsource)
+	};
+
+	const refreshGetDataWatingOutSource = async (value: any, arrJGNO: any) => {
+		await getDataWatingOutSource(value, arrJGNO)
+	};
+
+
+	const refreshLoadDataJGNO = async () => {
+		return await loadDataJGNO(mergeNo)
+	};
 	
 	useImperativeHandle(ref, () => ({
 		refreshData,
@@ -142,9 +159,7 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 		setPoNoValue,
 	}));
 
-	const refreshLoadDataJGNO = async () => {
-		return await loadDataJGNO(mergeNo)
-	};
+	
 	const setPoNoValue = async (value: any) => {
 		setPoNo(value)
 	};
@@ -163,7 +178,66 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [debouncedSearchTerm]);
-	
+	useEffect(() => {
+		(async () => {
+
+			if (testNoPoNo?.PONO) {
+				const checkResult = await checkVersionChange(testNoPoNo?.PONO)
+				checkVersion(checkResult)
+			}
+
+			if (listMaterialStockOutSample.length > 0) {
+
+				const list_data = await getDataWaitingApi(testNoPoNo, "all", "all")
+
+				const listDataWaitingFilter = list_data.map((item: any) => ({
+					Material_NO_Bom: item?.MatNo,
+					QTY_Bom: item?.CLSLMin
+				}))
+
+				const listMaterialStockOutSampleFilter = listMaterialStockOutSample.map((item: any) => ({
+					Material_NO_WH: item?.Material_No,
+					QTY_WH: item?.QTY_Bom
+				}))
+
+				const url = connect_string + "api/check_Version_Change";
+				const data = {
+					list_Bom: listDataWaitingFilter,
+					list_WH: listMaterialStockOutSampleFilter,
+					pono: testNoPoNo?.PONO
+				}
+
+				try {
+					const res = await axios.post(url, data);
+					let dataApi = []
+
+					if (res.data.Item2 === true) {
+						dataApi = await get_Material_Stock_Out_Sample_Api(testNoPoNo)
+						const result = dataApi.map((item: any) => ({
+							...item,
+							checkMaterial: res.data.Item1.includes(item?.Material_No)
+						}))
+
+						listMaterialStockOut(result)
+					}
+					if (res.data.Item1.length > 0 && res.data.Item2 === false) {
+
+						const result = listMaterialStockOutSample.map((item: any) => ({
+							...item,
+							checkMaterial: res.data.Item1.includes(item?.Material_No)
+						}))
+						listMaterialStockOut(result)
+					}
+
+				} catch (error) {
+					console.error("Error fetching data from check_Version_Change:", error);
+				}
+				// }
+			}
+		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [listMaterialStockOutSample]);
+
 
 	const paintingRow = (item: any, row: any) => {
 		if (typeof item !== "string") {
@@ -185,7 +259,21 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 		}
 		return true
 	}
-	
+	//api check có version thay đổi hay không
+	const checkVersionChange = async (value: any) => {
+		const url = connect_string + "api/check_status_Create";
+		const data = {
+			PONO: value
+		}
+		console.log("version", data)
+		try {
+			const response = await axios.post(url, data);
+			return response.data;
+		}
+		catch (error) {
+			console.error("Error during check version change:", error);
+		}
+	}
 
 	const getDataWaitingAndgetInfoPO = async (value: any) => {
 		setDisable(true)
@@ -232,6 +320,39 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 		}
 
 	}
+	const getDataWaitingApi = async (value: any, check_de: any, check_Gia_Cong_Lieu_Don: any) => {
+		if (value !== "") {
+
+			const url = connect_string + "api/get_Merge_Bom_ERP";
+			const data = {
+				Po_No: value?.PONO,
+				check_de: check_de,
+				check_Gia_Cong_Lieu_Don: check_Gia_Cong_Lieu_Don
+			};
+
+			try {
+				const res = await axios.post(url, data);
+
+				const arr = res.data.map((item: any, index: any) => ({
+					_id: index,
+					...item,
+				}));
+
+				arr.sort((a: any, b: any) => {
+					const statusComparison = b.Status.localeCompare(a.Status);
+					if (statusComparison !== 0) return statusComparison;
+
+					return b.MJBH.localeCompare(a.MJBH);
+				});
+
+				return arr;
+
+			} catch (error) {
+				console.error("Error fetching data from get_Merge_Bom_ERP:", error);
+			}
+		}
+	};
+
 	// lấy thông tin test no 
 	const getInfoPO = async (value: any) => {
 		const infoPO = await fromPOgetTestNoVersion_WH(value?.PONO)
@@ -292,6 +413,27 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 		
 
 	}
+	const get_Material_Stock_Out_Sample_Api = async (value: any) => {
+		const url = connect_string + "api/get_Material_Stock_Out_Sample";
+		const data = {
+			TestNo: value?.TestNo,
+			Po_No: value?.PONO,
+		};
+
+		try {
+			const res = await axios.post(url, data);
+
+			const arr = res.data.map((item: any, index: any) => ({
+				_id: index + 1,
+				...item,
+			}));
+
+			return arr
+
+		} catch (error) {
+			console.error("Error fetching Material Stock Out Sample:", error);
+		}
+	};
 	const getDataWatingOutSource = async (value: any, arrJGNO: any) => {
 		setListDataWaiting([]);
 		listMaterialBOM([]);

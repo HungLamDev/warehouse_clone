@@ -17,11 +17,15 @@ import Statistics from "../../components/StatisticsForm";
 import SampleSearchERP from "../../components/SampleSearchERP"
 import PdfViewer from "../../components/PDFView"
 import pdfFile from '../../assets/PDF/HD.pdf'
+import ModalCofirm from "../../components/ModalConfirm";
+import { useSelector } from "react-redux";
+import { connect_string } from "../LoginScreen/ChooseFactory";
+import axios from "axios";
+import ModalReturnMaterialSample from "./ModalReturnMaterialSample";
 const DeliverySampleLYVScreen = () => {
 	const { t } = useTranslation();
 	const location = useLocation();
 	const stockout = location.state && location.state.data;
-	console.log("stockout:", stockout);
 	const [open, setOpen] = useState(false)
 	const [modalName, setModalName] = useState('')
 	const [valuetotal, setValueTotal] = useState('')
@@ -82,7 +86,7 @@ const DeliverySampleLYVScreen = () => {
 			width: 150,
 		},
 		{
-			field: "barcode",
+			field: "Barcode",
 			headerName: "Barcode",
 			align: "center",
 			headerAlign: 'center',
@@ -380,75 +384,227 @@ const DeliverySampleLYVScreen = () => {
 
 		},
 	];
-4
+	const dataUser = useSelector((state: any) => state.UserLogin.user);
 
+
+	// Modal and Confirmation Handlers
+	const handleOpen = (name: string) => {
+		setModalName(name);
+		setOpen(true);
+	};
+
+	const handleClose = () => {
+		setModalName('');
+		setOpen(false);
+	};
+
+	const handleOpenConfirm = (confirmName: string) => {
+		setCofirmType(confirmName);
+		setOpenCofirm(true);
+	};
+
+	const handleCloseConfirm = () => {
+		setCofirmType('');
+		setOpenCofirm(false);
+	};
+
+	// QR Scanner Handlers
 	const handleFocus = (id: string) => {
 		setFocusedInputId(id);
 	};
+
 	const handleScan = (data: any | null) => {
 		if (data && focusedInputId) {
 			setTimeout(() => {
-				const inputElement = document.getElementById(
-					focusedInputId
-				) as HTMLInputElement;
-				if (inputElement) {
-					if (focusedInputId == "scan-po") {
-					}
+				const inputElement = document.getElementById(focusedInputId) as HTMLInputElement;
+				if (inputElement && focusedInputId === "scan-po") {
+					// Handle QR scan logic here if needed
 				}
 			});
 		}
-	}
+	};
+
+	// Table Formatting Functions
 	const paintingRow = (item: any, row: any) => {
 		if (row?.checkMaterial === true) {
-
-			return "#E52020"
+			return "#E52020";
 		}
 		if (row.Material_No !== null && row.QTY_Bom !== "" && ((new Decimal(row.QTY_Bom).minus(new Decimal(row.QTY_Sample))).toNumber() !== 0)) {
-			return "orange"
+			return "orange";
 		}
-
-		return "white"
+		return "white";
 	};
-	// xử lý tô màu xanh vs nhưng qrcode đã tạo phiếu xuất
+
 	const highlightText = (item: any, row: any) => {
-		console.log("row", row)
-		console.log("item",item)
-		if (typeof item !== "string") {
-			return item;
+		if (typeof item !== "string") return item;
+		const barcodes = row?.Barcode?.split("\r\n");
+		const regex = new RegExp(`(${barcodes?.join("|")})`, "gi");
+		const parts = item.split(regex);
+		return (
+			<>
+				{parts.map((part: any, index: any) => (
+					<React.Fragment key={index}>
+						{part.includes("*") ? (
+							<span style={{ color: "lightgreen" }}>{part.replace(/\*/g, "")}</span>
+						) : part}
+					</React.Fragment>
+				))}
+			</>
+		);
+	};
+
+	// Stockout and Material Handling
+	const handleImport_Material_Stock_Out_Sample = async (
+		Material_No: string, Barcode: string, QTY_Sample: string, User_ID: string,
+		PO_NO: string, TestNo: string, YPZLBH: string, Article: string,
+		QTY_BOM: any, KFJD: any, Size: any
+	) => {
+		const url = connect_string + "api/insert_Key_Material_Stock_Out_Sample";
+		const data = { Material_No, Barcode, QTY_Sample, User_ID, PONO: PO_NO, TestNo, YPZLBH, Article, QTY_Bom: QTY_BOM, Size, KFJD };
+		try {
+			await axios.post(url, data);
+		} catch (error) {
+			console.error("Error inserting material stock out sample:", error);
+		}
+	};
+
+	const handleStockoutOutsource = async () => {
+		setIsLoadingCreateSlip(true);
+		handleCloseConfirm();
+		const arrFilter = listCheckStockoutOutSource.filter((item: any) => item.stayus !== "done");
+		try {
+			if (arrFilter.length > 0) {
+				for (const newItem of arrFilter) {
+					await handleImport_Material_Stock_Out_Sample(
+						newItem.MatNo,
+						newItem?.CLZMLB === "Y" && newItem?.MJBH === "ZZZZZZZZZZ" ? "Outsource" : "Normal",
+						newItem?.CLSLMin,
+						dataUser[0].UserId,
+						PO_NOAndTestNo?.PONO,
+						PO_NOAndTestNo?.TestNo,
+						mergeNo,
+						article,
+						newItem?.CLSLMin,
+						kfjd,
+						newItem.SIZE
+					);
+				}
+				if (sidebarRef.current) {
+					handleRefresh()
+					sidebarRef.current.refreshMaterial_Stock_Out_Sample()
+				}// Gọi ngay sau khi xử lý xong
+			}
+		} catch (error) {
+			console.error("Error during stock out:", error);
+		} finally {
+			setIsLoadingCreateSlip(false);
+		}
+	};
+
+	const handleRefresh = () => {
+		if (sidebarRef.current) {
+			sidebarRef.current.refreshData();
+		}
+	};
+
+	// Material Return Handlers
+	const handleReturnMaterialSample = async (data: any) => {
+		const url = connect_string + "api/return_Material_Out";
+		const dataReturn = data.map((item: any) => ({ ...item, User_ID: dataUser[0].UserId }));
+		const response = await axios.post(url, dataReturn);
+		return response.data;
+	};
+
+	const handleDoubleClick = async (params: any, item: any) => {
+		setItemRow(item);
+		const barcodeList = item?.Barcode?.split("\r\n");
+		const keyList = item?.Key?.split("\r\n");
+		const sizeList = item?.Size?.split("\r\n");
+		const LLNOList = item?.LLNO.split("\r\n") || [];
+		const YPZLBHList = item?.YPZLBH?.split("\r\n");
+
+		const result = barcodeList.map((barcode: any, index: any) => ({
+			Barcode: barcode.split("➪")[0].trim(),
+			Barcode_Show: barcode,
+			Key: keyList[index],
+			Material_No: item.Material_No,
+			XXCC: sizeList[index],
+			LLNO: LLNOList[index] || "",
+			Article: article,
+			SCBH: YPZLBHList[index],
+			User_ID: dataUser[0].UserId,
+			_id: index,
+			stt: index + 1
+		}));
+
+		const url = connect_string + "api/check_list_LLNO_CFMID_KCLL";
+		const data = result.map((item: any) => ({ LLNO: item.LLNO }));
+		try {
+			setIsLoadingCreateSlip(true);
+			const response = await axios.post(url, data);
+			const updatedDataList = result.map((item: any) => ({
+				...item,
+				status: response.data.find((x: any) => x.LLNO === item.LLNO)?.status
+			}));
+			setDataMaterialSampleReturn(updatedDataList);
+			setIsLoadingCreateSlip(false);
+			handleOpenConfirm("return-material-sample");
+		} catch (error) {
+			console.error("Error checking LLNO:", error);
+		}
+	};
+
+	const handlePressOKReturnMaterialSample = async (data: any) => {
+		handleCloseConfirm();
+		const result = await handleReturnMaterialSample(data);
+		if (result === true) {
+			sidebarRef.current?.refreshMaterial_Stock_Out_Sample()
+			sidebarRef.current?.refreshData()
+
+		} else {
+			handleOpenConfirm("return-material-fail");
+		}
+	};
+
+	const handleReturnMaterial = async () => {
+		handleCloseConfirm()
+		handleCloseConfirm()
+		const result = await handleReturnMaterialSample(dataMaterialSampleReturn)
+		if (result === true) {
+			sidebarRef.current?.refreshMaterial_Stock_Out_Sample()
+			sidebarRef.current?.refreshData()
+		}
+		else {
+			handleOpenConfirm("return-material-fail")
+		}
+	};
+
+	// Miscellaneous Handlers
+	const handleGet_qty_out_Sample = (value: any, materialNo: any) => {
+		setQtyOutSample("")
+		const url = connect_string + "api/get_qty_out_Sample"
+		const data = {
+			PONO: value?.PONO,
+			TestNo: value?.TestNo,
+			barcode: "",
+			Material_No: materialNo
+		}
+		axios.post(url, data).then(res => {
+			const data = {
+				Material_No: materialNo,
+				QTY: res.data
+			}
+			setQtyOutSample(data)
+			console.log("res",)
 		}
 
-		// Kiểm tra nếu `Barcode` chứa dấu '*'
-		const isHighlighted = row?.Barcode?.includes("*");
-
-		return (
-			<span style={{ color: isHighlighted ? "lightgreen" : "inherit" }}>
-				{item.replace(/\*/g, "")} {/* Loại bỏ dấu '*' khi hiển thị */}
-			</span>
-		);
-
+		)
 	};
 
-	
-	const handleGet_qty_out_Sample = (value: any, Material_No: any) => {
-	}
-	const handleDoubleClick = async (params: any, item: any) => {
-
-	}
-	const handleOpen = (name: string) => {
-		setModalName(name)
-		setOpen(true);
-	}
-	const handleOpenConfirm = (confirmName: string) => {
-		setCofirmType(confirmName)
-		setOpenCofirm(true)
-	}
 	const handlePrintInfo = () => {
-
-	}
-	const handleClose = () => {
-		setModalName('')
-		setOpen(false);
+		// Logic for printing info if needed
 	};
+
 	return (
 		<FullScreenContainerWithNavBar
 			hidden={true}
@@ -467,7 +623,7 @@ const DeliverySampleLYVScreen = () => {
 						JGNO={(value: any) => setJGNO(value)}
 						JGNO_Check={(value: any) => setJGNO_Check(value)}
 						listMaterialBOM={(value: any) => { setListMaterialBOM(value) }}
-						listMaterialStockOut={(value: any) => setListMaterialStockout(value)}
+						listMaterialStockOut={(value: any) => { console.log("Dữ liệu listMaterialStockOut:", value), setListMaterialStockout(value) }}
 						Article={(value: any) => setArticle(value)}
 						ref={sidebarRef}
 						KFJD={(value: any) => setKFJD(value)}
@@ -590,7 +746,7 @@ const DeliverySampleLYVScreen = () => {
 										/>
 									)
 							}
-							
+
 							<Stack alignItems={'flex-end'} paddingRight={'10px'} paddingLeft={'10px'} flexDirection={"row"}>
 								<Stack width={"50%"} alignItems={"flex-start"}>
 									{
@@ -634,7 +790,11 @@ const DeliverySampleLYVScreen = () => {
 					</div>
 
 				</Stack>
-				{/* Quét Camera */}
+				{cofirmType === "stockout-outsource" && <ModalCofirm onPressOK={handleStockoutOutsource} open={openCofirm} onClose={handleCloseConfirm} title={t("msgStockOut") as string} />}
+				{cofirmType === "return-material" && <ModalCofirm onPressOK={handleReturnMaterial} open={openCofirm} onClose={handleCloseConfirm} title={t("msgReturnMaterial") as string} />}
+				{cofirmType === "return-material-sample" && <ModalReturnMaterialSample columns={columnsMaterialReturn} data={dataMaterialSampleReturn} onPressOK={handlePressOKReturnMaterialSample} open={openCofirm} onClose={handleCloseConfirm} title={t("msgReturnMaterial") as string} />}
+				{cofirmType === "return-material-error" && <ModalCofirm onPressOK={handleCloseConfirm} showCancel={false} open={openCofirm} title={t("msgReturnMaterialError") as string} />}
+				{cofirmType === "return-material-fail" && <ModalCofirm onPressOK={handleCloseConfirm} open={openCofirm} showCancel={false} title={t("msgReturnMaterialFail") as string} />}{/* Quét Camera */}
 				{isScannerOpen && (
 					<QRScannerV1
 						onScan={handleScan}
@@ -643,6 +803,7 @@ const DeliverySampleLYVScreen = () => {
 					/>
 				)}
 			</Stack>
+
 		</FullScreenContainerWithNavBar>
 	);
 };
