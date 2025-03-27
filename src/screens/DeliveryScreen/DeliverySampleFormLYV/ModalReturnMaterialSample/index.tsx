@@ -1,7 +1,7 @@
 import { Box, Button, Modal, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import MyTableNew from "../../../components/MyTableNew";
+import MyTableNew from "../../../../components/MyTableNew";
 
 interface ModalReturnMaterialSampleProps {
     title?: string,

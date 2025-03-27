@@ -1,7 +1,7 @@
 // hàm lấy thông tin po, testno, version
 
 import axios from "axios";
-import { connect_string } from "../../LoginScreen/ChooseFactory";
+import { connect_string } from "../../../LoginScreen/ChooseFactory";
 
 
 export const fromPOgetTestNoVersion = async (pono: string) => {

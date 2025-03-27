@@ -5,16 +5,17 @@ import React, { forwardRef, useEffect, useImperativeHandle, useState } from "rea
 import { useTranslation } from "react-i18next";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import GenericAutocomplete from "../../../components/GenericAutocomplete";
-import MyButton from "../../../components/MyButton";
-import MyTableNew from "../../../components/MyTableNew";
-import InputFieldV1 from "../../../components/InputField/index_new";
+import GenericAutocomplete from "../../../../components/GenericAutocomplete";
+import MyButton from "../../../../components/MyButton";
+import MyTableNew from "../../../../components/MyTableNew";
+import InputFieldV1 from "../../../../components/InputField/index_new";
 import CreateMergeBom from "../CreateMergeBOMForm";
 import axios from "axios";
-import { connect_string } from "../../LoginScreen/ChooseFactory";
+import { connect_string } from "../../../LoginScreen/ChooseFactory";
 import { useSelector } from "react-redux";
-import useDebounced from "../../../components/CustomHook/useDebounce";
+import useDebounced from "../../../../components/CustomHook/useDebounce";
 import { fromPOgetTestNoVersion_WH } from "../Func/Func";
+import ModalPrintSample from "../../../../components/ModalPrintSample/ModalPrintSample";
 interface SidebarProps {
 	column: any;
 	columnOutSource: any;
@@ -83,6 +84,7 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 	const [openCreateBOM, setOpenCreateBOM] = useState(false);
 	const [testNoPoNo, setTestNoPoNo] = useState<any>({})
 	const [mergeNo, setMergeNo] = useState<any>("")
+	const [openModalPrintSample, setOpenModalPrintSample] = useState(false)
 	const [listMaterialStockOutSample, setListMaterialStockOutSample] = useState<any[]>([])
 	const listChooseMaterial = [
 		{
@@ -851,7 +853,10 @@ const Sidebar = forwardRef<SidebarRef, SidebarProps>((props, ref) => {
 											height="2rem"
 											name={t("btnPrint_sample")}
 											disabled={disable}
+											onClick={() => setOpenModalPrintSample(true)} 
 										/>
+										{openModalPrintSample && <ModalPrintSample open={openModalPrintSample} handleClose={() => setOpenModalPrintSample(false)} data={PoOutsource || ""} />}
+
 									</Grid>
 								</Grid>
 							</Grid>

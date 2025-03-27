@@ -4,14 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { BiArrowBack } from 'react-icons/bi';
 import { useSelector } from 'react-redux';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import MyTableNew from '../../../components/MyTableNew';
-import MyButton from '../../../components/MyButton';
-import InputFieldV1 from '../../../components/InputField/index_new';
-import QRScanner from '../../../components/QRScanner';
-import { connect_string } from '../../LoginScreen/ChooseFactory';
+import MyTableNew from '../../../../components/MyTableNew';
+import MyButton from '../../../../components/MyButton';
+import InputFieldV1 from '../../../../components/InputField/index_new';
+import QRScanner from '../../../../components/QRScanner';
+import { connect_string } from '../../../LoginScreen/ChooseFactory';
 import axios from 'axios';
 import moment from 'moment';
-import useDebounced from '../../../components/CustomHook/useDebounce';
+import useDebounced from '../../../../components/CustomHook/useDebounce';
+import DetailMergeBOM from '../../../../components/CreateMergeBOM/DetailMergeBOM/index'
 export const fromPOgetTestNoVersion = async (pono: string) => {
     const url = connect_string + "api/get_testNo_Version"
     const data = {
@@ -156,6 +157,30 @@ const CreateMergeBom = (props: CreateMergeBomProps) => {
         setItemRow(item)
     }
     const handleOnClickBtn = (item: any, column: any) => {
+        setItemRowMergeBom(item)
+
+        if (item?.YPZLBH !== "" && item?.YPZLBH !== null && column?.field !== "print_all") {
+            return (
+                <MyButton
+                    height="1.5rem"
+                    name={t("lblDetail")}
+                    onClick={() => handleOpenConfirm("detail-merge-bom")}
+                />
+            );
+        }
+        else if (item?.YPZLBH !== "" && item?.YPZLBH !== null && column?.field === "print_all") {
+            return (
+                <MyButton
+                    height="1.5rem"
+                    name={t("btnPrintMergeNo")}
+                    onClick={() => handlePrintAll()}
+                />
+            );
+        }
+        else {
+            return <></>;
+        }
+
 
     }
     const handleOpenConfirm = (confirmName: string) => {
@@ -165,6 +190,13 @@ const CreateMergeBom = (props: CreateMergeBomProps) => {
     const createBOM = () => {
 
     }
+
+    const handleCloseConfirm = () => {
+        setCofirmType('')
+        setOpenCofirm(false)
+    }
+
+    const handlePrintAll = async () => {}
 
     //Tô màu dòng trong bảng------------------------------------------
     const paintingRow = (item: any, row: any) => {
@@ -427,7 +459,7 @@ const CreateMergeBom = (props: CreateMergeBomProps) => {
                     </Backdrop>
 
                 </Stack>
-
+                {cofirmType === "detail-merge-bom" && <DetailMergeBOM item={itemRowMergeBom} open={openCofirm} onClose={handleCloseConfirm} />}
 
             </Box>
 

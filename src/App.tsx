@@ -9,7 +9,7 @@ import Stockin from './screens/StockinScreenv2/StockinForm'
 import { useSelector } from 'react-redux'
 import StampPrintScreen from "./screens/StampPrintScreenv2"
 import RegisterLabel from "./screens/StampPrintScreenv2/RegisterLabel"
-import DeliverySampleLYVScreen from "./screens/DeliverySampleFormLYV/indexV2"
+import DeliverySampleLYVScreen from "./screens/DeliveryScreen/DeliverySampleFormLYV/indexV2"
 const ProtectedRoutes = ({ authenticate }: { authenticate: boolean }) => {
 
   if (!authenticate) {
