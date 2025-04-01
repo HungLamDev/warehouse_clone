@@ -11,12 +11,12 @@ const ArrayAccoutingCardState = createSlice({
     name: 'ArrayAccoutingCardState',
     initialState,
     reducers: {
-        copyArrayAccountingCardMaterial(state, action: PayloadAction<any[]>) {
+        copyValuesAccountingCardMaterial(state, action: PayloadAction<any[]>) {
             state.items = action.payload;
         },
         clearAccountingCardMaterial(state) {
     }
 }
 })
-export const { copyArrayAccountingCardMaterial , clearAccountingCardMaterial } = ArrayAccoutingCardState.actions
+export const { copyValuesAccountingCardMaterial , clearAccountingCardMaterial } = ArrayAccoutingCardState.actions
 export default ArrayAccoutingCardState.reducer

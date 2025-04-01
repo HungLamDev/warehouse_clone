@@ -65,11 +65,17 @@ const ChooseFactory = () => {
 
 
   useEffect(() => {
+
+    // BE https: /192.168.30.101:6969/
+    // FE https://192.168.30.101:8081/
     if (selectedValue === "LHG") {
       connect_string = 'https://192.168.30.100:8989/'
     }
     if (selectedValue === "LYV") {
-      connect_string = 'https://192.168.30.100:8989/'
+     //connect_string = 'https://192.168.30.231:8081/' 
+      //connect_string = 'https://192.168.30.100:8989/'
+      connect_string = 'https://192.168.30.101:6969/'
+
     }
   })
   const handleClickItem = (lng: FactoryName)=> {

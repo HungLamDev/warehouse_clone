@@ -22,6 +22,7 @@ const PdfViewer = (props: PdfViewerProps) => {
     boxShadow: 24,
     p: 1
   };
+  
   return (
     <Modal
       open={open}

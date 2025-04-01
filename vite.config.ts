@@ -7,8 +7,8 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   server: {
     host: true,
-    https: true,
   },
+
   base: "./",
   plugins: [
     react(),
@@ -21,6 +21,8 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
+        maximumFileSizeToCacheInBytes: 5000000, // Tăng giới hạn lên 5MB
+
       },
       includeAssets: [
         "**/*",
@@ -57,12 +59,4 @@ export default defineConfig({
       },
     }),
   ],
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: 'modern-compiler',
-      },
-    },
-  },
 });
-

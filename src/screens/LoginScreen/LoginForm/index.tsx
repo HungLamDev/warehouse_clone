@@ -88,6 +88,7 @@ const LoginForm = ()  => {
             User_Id: username,
             pass: md5(password).toUpperCase(),
         };
+        console.log("dataUser", dataUser)
         const dataUserBoss = {
           User_Id: username,
           pass: password,
@@ -96,7 +97,9 @@ const LoginForm = ()  => {
         console.log("Password:", password); // Log password
         console.log("Selected WareHouse:", selectedWareHouse); // Log selectedWareHouse
         console.log("connect_string", connect_string)
-        console.log("Factory Name:", factoryName); // Log factoryName
+        console.log("Factory Name:", factoryName);
+        console.log("Factory Name:", url); // Log factoryName
+         // Log factoryName
         setIsLoading(true);
         try {
             const response = await axios.post(url, dataUser, config);

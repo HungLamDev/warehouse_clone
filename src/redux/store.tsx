@@ -10,6 +10,8 @@ import UserLogin from "./UserLogin";
 import ArrayAccountingCardMaterial from './ArrayAccountingCardMaterial';
 import MaterialTableChecked from './MaterialTableChecked';
 import StockoutDetailChecked  from './ArrayAccountingCard';
+import TotalQtyOut from './TotalQtyOut';
+import ArrayStockout from './ArrayStockout';
 const store = configureStore({
     reducer: {
         UserLogin,
@@ -23,6 +25,8 @@ const store = configureStore({
         ArrayAccountingCardMaterial,
         MaterialTableChecked,
         StockoutDetailChecked,
+        TotalQtyOut, 
+        ArrayStockout
 
     },
 });

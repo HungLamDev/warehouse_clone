@@ -49,7 +49,7 @@ const ArrayChemistryState = createSlice({
                 state.items[indexToUpdate] = action.payload
             }
         },
-        coppyValues: (state , action: PayloadAction<any>) => {
+        copyValues: (state , action: PayloadAction<any>) => {
             state.items = action.payload
         },
         clearChemistry: (state) => {
@@ -63,6 +63,6 @@ const ArrayChemistryState = createSlice({
     }
 
 })
-export const { editItem , coppyValues, clearChemistry, TextFieldChangeArrayChemistry} = ArrayChemistryState.actions
+export const { editItem , copyValues, clearChemistry, TextFieldChangeArrayChemistry} = ArrayChemistryState.actions
 
 export default ArrayChemistryState.reducer
