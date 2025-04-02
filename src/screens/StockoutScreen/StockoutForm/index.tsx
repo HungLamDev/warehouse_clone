@@ -436,6 +436,7 @@ const StockoutScreen = () => {
       }
       const url = connect_string + 'api/getData_TextChange_Stock_Out'
       axios.post(url, data, config).then(response => {
+        console.log("getData_TextChange_Stock_Out", response )
         if (response.data.Barcode !== null) {
           const item = response.data;
           const newItem = {

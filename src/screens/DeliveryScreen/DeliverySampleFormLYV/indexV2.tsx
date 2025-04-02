@@ -19,9 +19,11 @@ import PdfViewer from "../../../components/PDFView"
 import pdfFile from '../../../assets/PDF/HD.pdf'
 import ModalCofirm from "../../../components/ModalConfirm";
 import { useSelector } from "react-redux";
-import { connect_string } from "../../LoginScreen/ChooseFactory";
+import { checkPermissionPrint, connect_string } from "../../LoginScreen/ChooseFactory";
 import axios from "axios";
 import ModalReturnMaterialSample from "./ModalReturnMaterialSample";
+import ConfirmDelivery from "../../../components/ConfirmDelivery";
+import { isEmptyOrNull } from "../../../utils/api_global";
 const DeliverySampleLYVScreen = () => {
 	const { t } = useTranslation();
 	const location = useLocation();
@@ -601,11 +603,61 @@ const DeliverySampleLYVScreen = () => {
 		)
 	};
 
-	const handlePrintInfo = () => {
+	const handlePrintInfo = async () => {
 		// Logic for printing info if needed
+		if (await checkPermissionPrint("mayin")) {
+			if (listCheckPrintInfo.length > 0) {
+				handleOpenConfirm("print")
+			}
+		}
+		else {
+			handleOpenConfirm('print-permission')
+		}
 	};
+	const handlePrintInfoOK = async () => {
+		console.log("handlePrintInfoOK")
 
-	return (
+	}
+	const create_Material_Stock_Out_Sample_Outsource = async () => {
+		console.log("create_Material_Stock_Out_Sample_Outsource")
+
+	}
+	const handleCreateSlip = (value: any) => {
+		console.log("handleCreateSlip", value)
+		if (
+			!isEmptyOrNull(value?.CKBH || "") &&
+			!isEmptyOrNull(mergeNo) &&
+			!isEmptyOrNull(dataUser[0]?.UserId) &&
+			!isEmptyOrNull(dataUser[0]?.factoryName)
+		) {
+			setIsLoadingCreateSlip(true)
+			const url = connect_string + "api/creat_Stock_Out_No"
+			const data = {
+				Factory: dataUser[0]?.factoryName,
+				Cb_WH: value?.CKBH || "",
+				User_ID: dataUser[0]?.UserId,
+				MergeNo: mergeNo
+			}
+			axios.post(url, data).then(res => {
+				if (res.data === true) {
+					sidebarRef.current?.refreshMaterial_Stock_Out_Sample()
+					handleOpenConfirm("insert-slip-sucess")
+				}
+				else {
+					handleOpenConfirm("insert-slip-error")
+				}
+			}).finally(() => {
+				setIsLoadingCreateSlip(false)
+			})
+		}
+		else {
+			handleOpenConfirm("no-information")
+		}
+
+
+	}
+	
+		return (
 		<FullScreenContainerWithNavBar
 			hidden={true}
 			sideBarDisable={true}
@@ -790,11 +842,20 @@ const DeliverySampleLYVScreen = () => {
 					</div>
 
 				</Stack>
+				{cofirmType === "no-list-bom" && <ModalCofirm showOk={false} open={openCofirm} onClose={handleCloseConfirm} title={t("lblNoBOM") as string} />}
+				{cofirmType === "no-material" && <ModalCofirm showOk={false} open={openCofirm} onClose={handleCloseConfirm} title={t("lblNoMaterial") as string} />}
+				{cofirmType === "no-stockout" && <ModalCofirm showOk={false} open={openCofirm} onClose={() => { handleCloseConfirm(), setQRCode("") }} title={t("lblNoStockOut") as string} />}
+				{cofirmType === "insert-slip-sucess" && <ModalCofirm showOk={false} open={openCofirm} onClose={handleCloseConfirm} title={t("btnCreateSlipSucess") as string} />}
+				{cofirmType === "insert-slip-error" && <ModalCofirm showOk={false} open={openCofirm} onClose={handleCloseConfirm} title={t("lblCreateSlipError") as string} />}
+				{cofirmType === "no-information" && <ModalCofirm showOk={false} open={openCofirm} onClose={handleCloseConfirm} title={t("msgCompleteInformation") as string} />}
 				{cofirmType === "stockout-outsource" && <ModalCofirm onPressOK={handleStockoutOutsource} open={openCofirm} onClose={handleCloseConfirm} title={t("msgStockOut") as string} />}
 				{cofirmType === "return-material" && <ModalCofirm onPressOK={handleReturnMaterial} open={openCofirm} onClose={handleCloseConfirm} title={t("msgReturnMaterial") as string} />}
 				{cofirmType === "return-material-sample" && <ModalReturnMaterialSample columns={columnsMaterialReturn} data={dataMaterialSampleReturn} onPressOK={handlePressOKReturnMaterialSample} open={openCofirm} onClose={handleCloseConfirm} title={t("msgReturnMaterial") as string} />}
 				{cofirmType === "return-material-error" && <ModalCofirm onPressOK={handleCloseConfirm} showCancel={false} open={openCofirm} title={t("msgReturnMaterialError") as string} />}
 				{cofirmType === "return-material-fail" && <ModalCofirm onPressOK={handleCloseConfirm} open={openCofirm} showCancel={false} title={t("msgReturnMaterialFail") as string} />}{/* Quét Camera */}
+				{cofirmType === 'print-permission' && <ModalCofirm onPressOK={handleCloseConfirm} open={openCofirm} onClose={handleCloseConfirm} title={t("lblPrintPermission") as string} />}
+				{cofirmType === "print" && <ModalCofirm open={openCofirm} onClose={handleCloseConfirm} title={t("msgCofirmPrint") as string} onPressOK={handlePrintInfoOK} />}
+				{cofirmType === 'print-success' && <ModalCofirm showCancel={false} onPressOK={handleCloseConfirm} open={openCofirm} onClose={handleCloseConfirm} title={t("msgPrintSuccess") as string} />}
 				{isScannerOpen && (
 					<QRScannerV1
 						onScan={handleScan}
@@ -802,6 +863,8 @@ const DeliverySampleLYVScreen = () => {
 						onClose={() => setIsScannerOpen(false)}
 					/>
 				)}
+				{cofirmType === "create-slip" && <ConfirmDelivery onPressOK={handleCreateSlip} open={openCofirm} onClose={handleCloseConfirm} title={t("lblConfirmCreateSlip") as string} />}
+				{cofirmType === "create-slip-outsource" && <ModalCofirm onPressOK={create_Material_Stock_Out_Sample_Outsource} open={openCofirm} onClose={handleCloseConfirm} title={t("msgCreateSlipOutsource") as string} />}
 			</Stack>
 
 		</FullScreenContainerWithNavBar>

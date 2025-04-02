@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit"
 import ArrayRowDowns from "./ArrayRowDowns";
-import ArrayRowUps from "./ArrayRowUp";
+import ArrayRowUp from "./ArrayRowUp";
+import ArrayRowUps from "./ArrayRowUps";
 import ArrayRowDowntoUp from './ArrayRowDowntoUps';
 import ArrayDeleteAndPrint from './ArrayDeleteAndPrint'
 import MaterialTable from './array'
@@ -26,7 +27,8 @@ const store = configureStore({
         MaterialTableChecked,
         StockoutDetailChecked,
         TotalQtyOut, 
-        ArrayStockout
+        ArrayStockout,
+        ArrayRowUp
 
     },
 });

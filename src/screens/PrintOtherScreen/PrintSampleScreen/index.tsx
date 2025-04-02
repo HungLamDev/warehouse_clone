@@ -1,117 +1,47 @@
-import { GridColDef } from '@mui/x-data-grid';
-import React, { useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import FullScreenContainerWithNavBar from '../../../components/FullScreenContainerWithNavBar';
-import { Box, Checkbox, CircularProgress, FormControlLabel, Grid, Stack } from '@mui/material';
-import MyButton from '../../../components/MyButton';
-import TableCheckBox from '../../../components/TableCheckBox';
-import FormPrintSample from '../../../components/FormPrintSample';
-import moment from 'moment';
-import TableSample from '../../../components/TableSample';
-import InputField from '../../../components/InputField';
-import { clearArrayDeleteAndPrint, coppyValuesArrayDeleteAndPrint } from '../../../redux/ArrayDeleteAndPrint';
-import { styletext } from '../../StockinScreenv2/StockinForm';
-import DatePickerField from '../../../components/DatePickerField';
-import { clearArrayRowDowns, copyValues } from '../../../redux/ArrayRowDowns';
-import { connect_string } from '../../LoginScreen/ChooseFactory';
-import axios from 'axios';
-import { createConfig } from '../../../utils/api';
-import { clearArrayRowUps, copyValuesRowUps } from '../../../redux/ArrayRowUp';
-import ModalCofirm from '../../../components/ModalConfirm';
+//#region import
+import FullScreenContainerWithNavBar from "../../../components/FullScreenContainerWithNavBar";
+import {
+    Box,
+    Grid,
+    FormControlLabel,
+    Checkbox,
+    Button,
+    Stack,
+    Typography,
+} from "@mui/material";
+import DatePickerField from "../../../components/DatePickerField";
+import InputField from "../../../components/InputField";
+import MyButton from "../../../components/MyButton";
+// import "./style.scss";
+import { GridColDef } from "@mui/x-data-grid";
+import moment, { Moment } from "moment";
+import { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { config, createConfig } from "../../../utils/api";
+import { checkPermissionPrint } from "../../LoginScreen/ChooseFactory";
+import { connect_string } from "../../LoginScreen/ChooseFactory";
+import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
+import { currentDay } from "../../../utils/date";
+import { useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import TableOrigin from "../../../components/TableOrigin";
+import { useTranslation } from "react-i18next";
+import TableCheckBox from "../../../components/TableCheckBox";
+import FormPrintSample from "../../../components/FormPrintSample";
+import { styletext } from "../../StockinScreenv2/StockinForm";
+import ModalCofirm from "../../../components/ModalConfirm";
+import TableDateTimePicker from "../../../components/TableDateTimePicker";
+import { clearArrayRowDowns, copyValues } from "../../../redux/ArrayRowDowns";
+import { copyValuesRowUps, clearArrayRowUps, removeItemByBarcodeRowUps, changeItemsByBarcodeArrayRowUps, addItemRowUps, changeItemsArrayRowUps } from "../../../redux/ArrayRowUps";
+import { clearArrayDeleteAndPrint, coppyValuesArrayDeleteAndPrint, changeItemsByBarcodeArrayDeleteAndPrint } from "../../../redux/ArrayDeleteAndPrint";
+import TableSample from "../../../components/TableSample";
 
+//#endregion
 const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
-
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-
-    const dataUser = useSelector((state: any) => state.UserLogin.user);
-    const ArrayRowDowns = useSelector((state: any) => state.ArrayRowDowns.items);
-    const ArrayRowUps = useSelector((state: any) => state.ArrayRowUps.items);
-    const ArrayDeleteAndPrint = useSelector((state: any) => state.ArrayDeleteAndPrint.items);
-
-
-    const [open, setOpen] = useState(false)
-    const [openPrintReview, setOpenPrintReview] = useState(false)
-    const [isloading, setIsLoading] = useState(false)
-    const [rowOrderNo, setrowOrderNo] = useState<any[]>([]);
-    const [chxSize, setChxSize] = useState(false);
-    const [chxResidual_supplies, setchxResidual_supplies] = useState(false)
-    const [chxChange_Material, setChxChange_Material] = useState(false);
-    const [chxAll_Outsource, setchxAll_Outsource] = useState(false);
-    const [chxReprint, setchxReprint] = useState(false)
-    const [chxPrintRY, setChxPrintRY] = useState(false);
-    const [chxInventory, setChxInventory] = useState(false);
-    const [txtOrderNo, setTxtOrderNo] = useState('')
-    const [txtMaterial_No, setTxtMaterial_No] = useState('')
-    const [txtInvoid_No, setTxtInvoid_No] = useState('')
-    const [txtOutsource, setTxtOutsource] = useState(data || '')
-    const [listChxDown, setListChxDown] = useState<any[]>([])
-    const [listChxOrder, setListChxOrder] = useState<any[]>([])
-    const [dtpDateTo, setdtpDateTo] = useState(moment().format("YYYY/MM/DD"));
-    const [openCofirm, setOpenCofirm] = useState(false)
-    const [cofirmType, setCofirmType] = useState('')
-    const [columnEdit, setColumnEdit] = useState('')
-
-
-    const controllerRef = useRef(new AbortController());
-    const configNew = createConfig(controllerRef.current.signal);
-
-    const handleChxPrintRY = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setChxPrintRY(event.target.checked);
-    };
-
-    const handlechxSize = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setChxSize(event.target.checked);
-        if (event.target.checked === true) {
-            setColumnEdit('Size')
-        }
-        else {
-            setColumnEdit('')
-        }
-    };
-
-    const handlechxResidual_supplies = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setchxResidual_supplies(event.target.checked);
-    };
-
-    const handleChxChange_Material = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setChxChange_Material(event.target.checked);
-        if (event.target.checked === true) {
-            setColumnEdit('CLBH_Material_No')
-        }
-        else {
-            setColumnEdit('')
-        }
-    };
-
-    const handlechxAll_Outsource = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setchxAll_Outsource(event.target.checked);
-    };
-
-    const handleChxInventory = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setChxInventory(event.target.checked);
-    };
-
-    const handlechxReprint = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setchxReprint(event.target.checked);
-    };
-
-    const handletxtOrderNo = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTxtOrderNo(event.target.value);
-    };
-    const handlextMaterial_No = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTxtMaterial_No(event.target.value);
-    };
-    const handlextInvoid_No = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTxtInvoid_No(event.target.value);
-    };
-    const handlextOutsource = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTxtOutsource(event.target.value);
-    };
 
     //#region column header table
     const columnsUp: GridColDef[] = [
@@ -319,6 +249,119 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
             headerClassName: "custom-header",
         },
     ];
+    //#endregion
+
+    //#region useSelector
+    const dataUser = useSelector((state: any) => state.UserLogin.user);
+    const ArrayRowDowns = useSelector((state: any) => state.ArrayRowDowns.items);
+    const ArrayRowUps = useSelector((state: any) => state.ArrayRowUps.items);
+    const ArrayDeleteAndPrint = useSelector((state: any) => state.ArrayDeleteAndPrint.items);
+    //#endregion
+
+    //#region Variable
+    //#region  Cancel request axios
+    const controllerRef = useRef(new AbortController());
+    const configNew = createConfig(controllerRef.current.signal);
+    // Func cancel Request
+    const cancelRequest = () => {
+        controllerRef.current.abort();
+    };
+    //#endregion
+
+    const [open, setOpen] = useState(false)
+    const [openPrintReview, setOpenPrintReview] = useState(false)
+    const [isloading, setIsLoading] = useState(false)
+    const [rowOrderNo, setrowOrderNo] = useState<any[]>([]);
+    const [chxSize, setChxSize] = useState(false);
+    const [chxResidual_supplies, setchxResidual_supplies] = useState(false)
+    const [chxChange_Material, setChxChange_Material] = useState(false);
+    const [chxAll_Outsource, setchxAll_Outsource] = useState(false);
+    const [chxReprint, setchxReprint] = useState(false)
+    const [chxPrintRY, setChxPrintRY] = useState(false);
+    const [chxInventory, setChxInventory] = useState(false);
+    const [txtOrderNo, setTxtOrderNo] = useState('')
+    const [txtMaterial_No, setTxtMaterial_No] = useState('')
+    const [txtInvoid_No, setTxtInvoid_No] = useState('')
+    const [txtOutsource, setTxtOutsource] = useState(data || '')
+    const [listChxDown, setListChxDown] = useState<any[]>([])
+    const [listChxOrder, setListChxOrder] = useState<any[]>([])
+    const [dtpDateTo, setdtpDateTo] = useState(moment().format("YYYY/MM/DD"));
+    const [openCofirm, setOpenCofirm] = useState(false)
+    const [cofirmType, setCofirmType] = useState('')
+    const [columnEdit, setColumnEdit] = useState('')
+    //#endregion
+
+    //#region Func OnChange Input
+    const handleChxPrintRY = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setChxPrintRY(event.target.checked);
+    };
+
+    const handlechxSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setChxSize(event.target.checked);
+        if (event.target.checked === true) {
+            setColumnEdit('Size')
+        }
+        else {
+            setColumnEdit('')
+        }
+    };
+
+    const handlechxResidual_supplies = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setchxResidual_supplies(event.target.checked);
+    };
+
+    const handleChxChange_Material = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setChxChange_Material(event.target.checked);
+        if (event.target.checked === true) {
+            setColumnEdit('CLBH_Material_No')
+        }
+        else {
+            setColumnEdit('')
+        }
+    };
+
+    const handlechxAll_Outsource = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setchxAll_Outsource(event.target.checked);
+    };
+
+    const handleChxInventory = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setChxInventory(event.target.checked);
+    };
+
+    const handlechxReprint = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setchxReprint(event.target.checked);
+    };
+
+    const handletxtOrderNo = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTxtOrderNo(event.target.value);
+    };
+    const handlextMaterial_No = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTxtMaterial_No(event.target.value);
+    };
+    const handlextInvoid_No = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTxtInvoid_No(event.target.value);
+    };
+    const handlextOutsource = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTxtOutsource(event.target.value);
+    };
+    //#endregion
+
+    //#region useEffect
+
+    useEffect(() => {
+        if (listChxOrder.length > 0) {
+            const filteredListChx = ArrayRowDowns.filter((item: any) => {
+                return listChxOrder.some(order => order.CGNO_Order_No === item.CGNO_Order_No);
+            });
+            setListChxDown(filteredListChx);
+        } else {
+            setListChxDown([]);
+        }
+
+    }, [listChxOrder]);
+
+    //#endregion
+
     //#region Func Logic
     const handleOpenConfirm = (name: string) => {
         setCofirmType(name)
@@ -330,17 +373,13 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
         setOpenCofirm(false)
     }
 
-    const cancelRequest = async () => {
-
-    }
-    const handleSearch = async () => {
+    const handleSearch = () => {
         if (txtOrderNo !== "" || txtMaterial_No !== "" || txtInvoid_No !== "" || txtOutsource !== "") {
             setOpen(true)
             setIsLoading(true)
             setListChxOrder([])
             setListChxDown([])
             dispatch(clearArrayRowDowns())
-
 
             const url = connect_string + "api/Search_Data_Print_Sample"
             const data = {
@@ -401,63 +440,27 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                 setOpen(false)
             })
         }
-
     }
-    const handleRefresh = async () => {
-        setListChxOrder([])
-        setListChxDown([])
-        dispatch(clearArrayRowDowns())
-        dispatch(clearArrayRowUps())
-        dispatch(clearArrayDeleteAndPrint())
 
-    }
-    const handleDelete = async () => {
-        setOpen(true)
-        setIsLoading(true)
-        const url = connect_string + "api/Delete_Label_Sample"
-        const data = ArrayDeleteAndPrint.map((item: any) => ({
-            chxSize: chxSize,
-            chxResidual_supplies: chxResidual_supplies,
-            User_Serial_Key: dataUser[0].UserId,
-            dcmCheck: true,
-            dcpBarcode: item.Barcode,
-            get_version: dataUser[0].WareHouse
-        }))
-        axios.post(url, data, configNew).then(response => {
-            if (response.data === true) {
-                const filteredArr1 = ArrayRowUps.filter((item1: any) => {
-                    return !ArrayDeleteAndPrint.some((item2: any) => item1.Barcode === item2.Barcode);
-                });
-                // setrowUps(filteredArr1)
-                dispatch(copyValuesRowUps(filteredArr1));
-
-            }
-            else {
-                handleOpenConfirm('delete-error')
-            }
-        }).finally(() => {
-            setIsLoading(false)
-            setOpen(false)
-        })
-
-    }
-    const handlePrint = async () => {
-
-    }
     const handleDoubleClick = async (colname: string, item: any) => {
-        if(listChxDown) {
+        // && listChxDown.includes(item)
+        if (listChxDown) {
             setOpen(true)
             setIsLoading(true)
+
             let rowTableUpFilter: any[] = []
-            for (const item of listChxDown){
-                rowTableUpFilter.push(await handleLoginDoubleClickStamp(item))
+            for (const item of listChxDown) {
+                rowTableUpFilter.push(await handleLogicDoubleClickStamp(item));
             }
+
             const filteredDataInRowUps1 = ArrayRowUps.filter((oldItem: any) => {
                 return !rowTableUpFilter.some((newItem: any) => {
                     return newItem.Barcode === oldItem.Barcode;
                 });
             });
             const mergedDataInRowUps = [...filteredDataInRowUps1, ...rowTableUpFilter];
+            console.log("mergedDataInRowUps", mergedDataInRowUps)
+
 
             dispatch(copyValuesRowUps(mergedDataInRowUps));
 
@@ -467,9 +470,9 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
         else {
             handleOpenConfirm('checkdata')
         }
-
     }
-    const handleLoginDoubleClickStamp = async (item: any) => {
+
+    const handleLogicDoubleClickStamp = async (item: any) => {
         const url = connect_string + "api/DoubleClick_Data_Print_Sample"
         const data =
         {
@@ -505,6 +508,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
             get_version: dataUser[0].WareHouse,
             Type_Order: item?.Type_Order
         }
+
         const res = await axios.post(url, data, configNew)
 
         if (res.data.length > 0) {
@@ -529,26 +533,110 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                 Type_Order: item?.Type_Order
             }))
 
+
             return arr[0] || [];
 
         }
     }
 
-    const handlePrintOK = () => {
+    const handleDelete = () => {
+        setOpen(true)
+        setIsLoading(true)
+        const url = connect_string + "api/Delete_Label_Sample"
+        const data = ArrayDeleteAndPrint.map((item: any) => ({
+            chxSize: chxSize,
+            chxResidual_supplies: chxResidual_supplies,
+            User_Serial_Key: dataUser[0].UserId,
+            dcmCheck: true,
+            dcpBarcode: item.Barcode,
+            get_version: dataUser[0].WareHouse
+        }))
+
+        axios.post(url, data, configNew).then(response => {
+            if (response.data === true) {
+                const filteredArr1 = ArrayRowUps.filter((item1: any) => {
+                    return !ArrayDeleteAndPrint.some((item2: any) => item1.Barcode === item2.Barcode);
+                });
+                // setrowUps(filteredArr1)
+                dispatch(copyValuesRowUps(filteredArr1));
+
+            }
+            else {
+                handleOpenConfirm('delete-error')
+            }
+        }).finally(() => {
+            setIsLoading(false)
+            setOpen(false)
+        })
 
     }
 
-    return (
+    const handlePrint = async () => {
+        if (await checkPermissionPrint(dataUser[0].UserId)) {
+            if (ArrayDeleteAndPrint.length > 0) {
+                handleOpenConfirm('print')
+            }
+            else {
+                handleOpenConfirm('print-error')
+            }
+        }
+        else {
+            handleOpenConfirm('print-permission')
+        }
 
-        <FullScreenContainerWithNavBar sideBarDisable={true}
+    }
+
+    const handlePrintOK = () => {
+        handleOpenConfirm('print-success')
+        setOpen(true)
+        setIsLoading(true)
+        const url = connect_string + "api/Print_Sample_CLick"
+        const data = ArrayDeleteAndPrint.map((item: any) => ({
+            dcpBarcode: item.Barcode,
+            User_Serial_Key: dataUser[0].UserId,
+            Material_Name: item.Material_Name,
+            Work_Order: item.Work_Order,
+            dcpCheck: true,
+            get_version: dataUser[0].WareHouse,
+            get_Factory: dataUser[0].factoryName
+        }))
+        axios.post(url, data, config).then(response => {
+            if (response.data === true) {
+
+            }
+            else {
+                handleOpenConfirm('print-error')
+            }
+        }).finally(() => {
+            setIsLoading(false)
+            setOpen(false)
+        })
+    }
+
+
+    const handleRefresh = () => {
+        setListChxOrder([])
+        setListChxDown([])
+        dispatch(clearArrayRowDowns())
+        dispatch(clearArrayRowUps())
+        dispatch(clearArrayDeleteAndPrint())
+    }
+
+    //#endregion
+
+    return (
+        <FullScreenContainerWithNavBar
+            sideBarDisable={true}
             sideBarNavigate=""
             title={t("frmPrint_Sample") as string}
             navigate={"/"}
-            cancelRequest={cancelRequest}>
+            cancelRequest={cancelRequest}
+        >
             <Box
                 paddingX={1}
                 paddingBottom={1}
-                className={"dark-bg-secondary border-bottom-white"}>
+                className={"dark-bg-secondary border-bottom-white"}
+            >
                 <Stack direction={"row"}>
                     <Grid container>
                         <Grid item display={'flex'} xs={4.5}>
@@ -563,7 +651,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 disable={isloading}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={1.5} >
+                        <Grid item display={'flex'} xs={1.5}>
                             {/* Check đơn tồn */}
                             <FormControlLabel
                                 sx={styletext}
@@ -572,7 +660,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 label={t("cbxInventory")}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={4.5} >
+                        <Grid item display={'flex'} xs={4.5}>
                             {/* Đơn gia công */}
                             <InputField
                                 label={t("lblOutsource") as string}
@@ -583,7 +671,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 disable={isloading}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={1.5} >
+                        <Grid item display={'flex'} xs={1.5}>
                             {/* Check tất cả số phiếu bên phải*/}
                             <FormControlLabel
                                 sx={styletext}
@@ -592,7 +680,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 label={t("chxAll")}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={4.5} >
+                        <Grid item display={'flex'} xs={4.5}>
                             {/* Mã vật tư */}
                             <InputField
                                 label={t("dcmMaterial_No") as string}
@@ -603,7 +691,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 disable={isloading}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={1.5} >
+                        <Grid item display={'flex'} xs={1.5}>
                             {/* Check size */}
                             <FormControlLabel
                                 sx={styletext}
@@ -612,7 +700,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 label={"Size"}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={4.5} >
+                        <Grid item display={'flex'} xs={4.5}>
                             {/* Mã Invoice */}
                             <InputField
                                 label={"Invoice"}
@@ -623,7 +711,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 disable={isloading}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={1.5} >
+                        <Grid item display={'flex'} xs={1.5}>
                             {/* Check chuyển mã */}
                             <FormControlLabel
                                 sx={{ width: "100%", display: "flex", ...styletext }}
@@ -632,7 +720,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 label={t("chxTranscoding")}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={2} >
+                        <Grid item display={'flex'} xs={2}>
                             {/* Check tất cả */}
                             <FormControlLabel
                                 sx={styletext}
@@ -640,7 +728,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 control={<Checkbox checked sx={{ color: "white" }} />}
                                 label={t("chxAll")} />
                         </Grid>
-                        <Grid item display={'flex'} xs={2.5} >
+                        <Grid item display={'flex'} xs={2.5}>
                             {/* Check in lại */}
                             <FormControlLabel
                                 sx={styletext}
@@ -649,7 +737,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                 label={t("chxReprint")}
                             />
                         </Grid>
-                        <Grid item display={'flex'} xs={1.5} >
+                        <Grid item display={'flex'} xs={1.5}>
                             {/* Check in lại RY */}
                             <FormControlLabel
                                 sx={{ width: "100%", display: "flex", ...styletext }}
@@ -665,21 +753,21 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                             />
                         </Grid>
                         {chxPrintRY ? (
-                        <>
-                            {/* Lệnh */}
-                            <Grid item xs={2.8} display={'flex'}>
-                                <InputField label={t("dcpWork_Order") as string + "\u2002"} handle={null} keydown={null} value={""} />
-                            </Grid>
-                            {/* Chọn ngày */}
-                            <Grid item xs={1.5} display={'flex'}>
-                                <DatePickerField onValueChange={dtpDateTo} />
-                            </Grid>
+                            <>
+                                {/* Lệnh */}
+                                <Grid item xs={2.8} display={'flex'}>
+                                    <InputField label={t("dcpWork_Order") as string + "\u2002"} handle={null} keydown={null} value={""} />
+                                </Grid>
+                                {/* Chọn ngày */}
+                                <Grid item xs={1.5} display={'flex'}>
+                                    <DatePickerField onValueChange={dtpDateTo} />
+                                </Grid>
 
-                        </>
+                            </>
                         ) : <Grid item xs={4.3} display={'flex'}></Grid>
                         }
-                        <Grid item display={'flex'} xs={0.2} ></Grid>
-                        <Grid item display={'flex'} xs={1.5} >  
+                        <Grid item display={'flex'} xs={0.2}></Grid>
+                        <Grid item display={'flex'} xs={1.5}>
                             {(dataUser[0].UserRole === 'Manager' || dataUser[0].UserRole === "Administrator") &&
                                 // Check in bù
                                 <FormControlLabel
@@ -688,13 +776,17 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                                     control={<Checkbox sx={{ color: "white" }} value={chxResidual_supplies} onChange={handlechxResidual_supplies} />}
                                     label={t("chxResidual_supplies")}
                                 />
-                            }</Grid>
-                    </Grid>
+                            }
+                        </Grid>
+                    </Grid >
                 </Stack>
-                <Stack width={"100%"}
+
+                <Stack
+                    width={"100%"}
                     direction={"row"}
                     spacing={3}
-                    alignItems={"center"}>
+                    alignItems={"center"}
+                >
                     {/* Nút tìm kiếm */}
                     <MyButton name={t("btnSearch")} onClick={handleSearch} disabled={isloading} />
                     {/* Nút làm mới */}
@@ -714,7 +806,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                     {cofirmType === 'print-permission' && <ModalCofirm onPressOK={handleCloseConfirm} open={openCofirm} onClose={handleCloseConfirm} title={t("lblPrintPermission") as string} />}
                     {cofirmType === 'delete-error' && <ModalCofirm onPressOK={handleCloseConfirm} open={openCofirm} onClose={handleCloseConfirm} title={t("msgDeleteError") as string} />}
                     {cofirmType === 'checkdata' && <ModalCofirm onPressOK={handleCloseConfirm} open={openCofirm} onClose={handleCloseConfirm} title={t("lblCheck") as string} />}
-                    {cofirmType === 'print' && <ModalCofirm onPressOK={handlePrintOK} open={openCofirm} onClose={handleCloseConfirm} title={t("msgCofirmPrint") as string} />}   
+                    {cofirmType === 'print' && <ModalCofirm onPressOK={handlePrintOK} open={openCofirm} onClose={handleCloseConfirm} title={t("msgCofirmPrint") as string} />}
                 </Stack>
             </Box>
             <Stack overflow={"hidden"} sx={{ height: "100%" }}>
@@ -727,7 +819,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                     />
                 </Stack>
                 <Stack direction="row" sx={{ height: "50%" }}>
-                    <Stack width={'85%'} height={'100%'}>
+                    <Stack width={'85%'} height={'100%'} >
                         <TableSample
                             columns={columnsDown}
                             rows={ArrayRowDowns}
@@ -753,6 +845,7 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                         <TableCheckBox
                             columns={columnsOrderNo}
                             rows={rowOrderNo}
+
                             onDoubleClick={null}
                             listChx={(params: any) => setListChxOrder(params)}
                             arrNotShowCell={["_id"]}
@@ -761,7 +854,8 @@ const DataHistoryPrintScreen = ({ data }: { data?: any }) => {
                 </Stack>
             </Stack>
         </FullScreenContainerWithNavBar>
-    )
-}
+    );
 
-export default DataHistoryPrintScreen
+};
+
+export default DataHistoryPrintScreen;
