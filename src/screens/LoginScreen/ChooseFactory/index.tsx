@@ -22,16 +22,15 @@ export interface IFactoryItem {
 }
 export let connect_string = ''
 export const checkPermissionPrint = async (UserId: string) => {
-  const url = connect_string + ""
+  const url = connect_string + "api/check_print_name"
   const data = {
-    user_id1 : UserId,
+    UserId : UserId,
   }
   try{
     const response = await axios.post(url, data,config)
     return response.data
 
-  } catch (error
-  ){
+  } catch (error ){
     return false
   }
 }

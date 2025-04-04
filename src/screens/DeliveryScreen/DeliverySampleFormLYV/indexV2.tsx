@@ -605,7 +605,7 @@ const DeliverySampleLYVScreen = () => {
 
 	const handlePrintInfo = async () => {
 		// Logic for printing info if needed
-		if (await checkPermissionPrint("mayin")) {
+		if (await checkPermissionPrint("51400")) {
 			if (listCheckPrintInfo.length > 0) {
 				handleOpenConfirm("print")
 			}
@@ -616,6 +616,41 @@ const DeliverySampleLYVScreen = () => {
 	};
 	const handlePrintInfoOK = async () => {
 		console.log("handlePrintInfoOK")
+		handleCloseConfirm()
+		const filteredList = listMaterialBOM.filter((item1: any) =>
+			listCheckPrintInfo.some((item2: any) => item1.MatNo === (JGNO === null ? item2.Material_No : item2.CLBH))
+		);
+		console.log(filteredList);
+		const list_Prints = filteredList.map((item: any) => ({
+			// standard: item?.Qty || "",
+			standard: (JGNO === null ? item?.CLSLMin : item?.Qty) || "",
+			Name_Material: item?.MatName || "",
+			article: item?.ARTICLE || "",
+			Stage: kfjd || "",
+			Season: JiJie || "",
+			Pono: item?.po || "",
+			Supplier_Name: item?.Supplier || "",
+			Material_No: item?.MatNo || ""
+		}))
+
+		const data = {
+			list_Prints: list_Prints,
+			// user mayin sẽ in tem thông tin kho mẫu
+			UserID: "51400"
+		}
+		console.log("data", data )		
+		const url = connect_string + "api/PrintLabel_Delivery_Sample_CLick_Standard"
+		axios.post(url, data).then(res => {
+			console.log(res)
+
+			if (res.data == true) {
+				handleOpenConfirm('print-success')
+			}
+			setDisable(false)
+		}).catch(() => {
+			handleOpenConfirm('print-permission')
+			setDisable(false)
+		})
 
 	}
 	const create_Material_Stock_Out_Sample_Outsource = async () => {
@@ -653,8 +688,6 @@ const DeliverySampleLYVScreen = () => {
 		else {
 			handleOpenConfirm("no-information")
 		}
-
-
 	}
 	
 		return (

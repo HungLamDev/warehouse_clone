@@ -46,6 +46,7 @@ const ConfirmDelivery = (props: ConfirmDeliveryProps) => {
     setDisable(true)
     const url = connect_string + "api/get_KCCK_ERP"
     axios.post(url).then(res => {
+      
       setListWH(res.data)
     }).finally(() => {
       setDisable(false)

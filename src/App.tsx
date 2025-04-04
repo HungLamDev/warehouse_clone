@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux'
 import StampPrintScreen from "./screens/StampPrintScreenv2"
 import RegisterLabel from "./screens/StampPrintScreenv2/RegisterLabel"
 import DeliverySampleLYVScreen from "./screens/DeliveryScreen/DeliverySampleFormLYV/indexV2"
+import UpdateWH from "./screens/SettingsScreen/UpdateWH"
 const ProtectedRoutes = ({ authenticate }: { authenticate: boolean }) => {
 
   if (!authenticate) {
@@ -39,6 +40,7 @@ function App() {
          <Route path={"/stock-in"} element={<Stockin />}></Route> 
          <Route path={"/register-label"} element={<RegisterLabel />}></Route>
          <Route path={"/delivery-sample-lyv"} element={<DeliverySampleLYVScreen />}></Route>
+          <Route path={"/update-WH"} element={<UpdateWH />}></Route>
       </Route>
 
       <Route path="/login" element={<LoginScreen />}/>

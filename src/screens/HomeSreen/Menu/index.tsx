@@ -262,6 +262,11 @@ const Menu = () => {
             title: t("lblDelete_Order") as string,
             icon: PermissionPrintIcon,
             path: "/permission-print"
+        },
+        {
+            title: t("lblupdate_inforWH") as string,
+            icon: workerIcon,
+            path: "/update-WH"
         }
     ]
 
@@ -407,10 +412,16 @@ const Menu = () => {
                     );
                 })}
             </Grid>
+            {/* Modal đổi mật khẩu */}
             {modalName === 'change-password' && <ChangePassword open={open} onClose={() => setOpen(false)} />}
             {/* Modal danh sách ngôn ngữ */}
             {modalName === 'languages' && <ModalChoose setShowState={() => setShowPage(false)} open={open} onClose={() => setOpen(false)} array={myArray} />}
+            {modalName === 'settings' && dataUser[0].UserRole === 'Administrator' && <ModalChoose setShowState={() => setShowPage(false)} open={open} onClose={() => setOpen(false)} array={listSettings} />}
 
+            {/* Modal danh sách in khác */}
+            {modalName === 'print_other' && <ModalChoose setShowState={() => setShowPage(false)} open={open} onClose={() => setOpen(false)} array={listPrintOther} />}
+            {/* Chiếc xe chạy */}
+            
             {modalName === 'listAccounting_Card' && <ModalChoose open={open} onClose={() => setOpen(false)} array={list} />}
         </Stack>
     )
