@@ -10,6 +10,8 @@ import { connect_string } from "../../LoginScreen/ChooseFactory";
 import axios from "axios";
 import { config } from "../../../utils/api";
 import GenericAutocomplete from "../../../components/GenericAutocomplete";
+import TableOrigin from "../../../components/TableOrigin";
+import ModalCofirm from "../../../components/ModalConfirm";
 
 const UpdateWH = () => {
     const { t } = useTranslation();
@@ -18,13 +20,17 @@ const UpdateWH = () => {
     const [rows, setRows] = useState<any[]>([]);
     const [Rack, setRack] = useState("");
     const [MaterialType, setMaterialType] = useState("");
-    const [StorageSerial, setStorageSerial] = useState("");
     const [disable, setDisable] = useState(false);
     const [loading, setLoading] = useState(false);
     const [color, setColor] = useState(false);
     const [listWH, setListWH] = useState<any[]>([]);
     const [selectedWH, setSelectedWH] = useState<any>(null);
-    const [editedRows, setEditedRows] = useState<any[]>([]);
+    const [openCofirm, setOpenCofirm] = useState(false)
+    const [cofirmType, setCofirmType] = useState('')
+    const [originalRows, setOriginalRows] = useState<any[]>([]);
+    const [RackInput, setRackInput] = useState("");
+    const [RackList, setRackList] = useState<string[]>([]);
+
 
     const handleRack = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRack(event.target.value);
@@ -32,14 +38,22 @@ const UpdateWH = () => {
     const handleMaterialType = (event: React.ChangeEvent<HTMLInputElement>) => {
         setMaterialType(event.target.value);
     };
-    const handStorageSerial = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setStorageSerial(event.target.value);
+    const handleRackInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = event.target.value;
+        setRackInput(rawValue);
+
+        const racks = rawValue
+            .split(/\s+/)            // tách theo khoảng trắng, tab, newline
+            .map(s => s.trim())      // xóa khoảng trắng 2 bên
+            .filter(Boolean);        // loại bỏ chuỗi rỗng
+
+        setRackList(racks);
+        console.log("list", racks)
     };
 
     const columns: any[] = [
         { field: "stt", headerName: t("dcpNum") as string, width: 160, headerClassName: "custom-header" },
-        { field: "Rack", headerName: t("dcpRack") as string, width: 160, headerClassName: "custom-header" },
-        { field: "Storage_Serial", headerName: "Storage_Serial" as string, width: 150, headerClassName: "custom-header" },
+        { field: "Rack", headerName: t("dcpRack") as string, width: 1000, headerClassName: "custom-header" },
         { field: "Position", headerName: "Position" as string, width: 160, headerClassName: "custom-header" },
         { field: "Material_Type", headerName: "Material_Type" as string, width: 300, headerClassName: "custom-header" },
         { field: "WH", headerName: "WH", width: 160, headerClassName: "custom-header", selected: true },
@@ -58,15 +72,13 @@ const UpdateWH = () => {
         setDisable(true);
         let url = "";
         let data = {};
-
-        if (Rack === "" && MaterialType === "" && StorageSerial === "") {
-            url = connect_string + "api/api/get_rack_all";
-            data = { WH: selectedWH?.value };
-        } else {
+        console.log("selectedWH:", selectedWH);
+        console.log("selectedWH?.value:", selectedWH?.value);
             url = connect_string + "api/get_data_storeage";
-            data = { Rack, Material_Type: MaterialType, StorageSerial };
-        }
-
+            data = { RackList: RackList || "",
+                 Material_Type: MaterialType || "",
+                WH: selectedWH || ""};
+            console.log("data view" ,data)
         try {
             const response = await axios.post(url, data, config);
             const arr = response.data.map((item: any, index: number) => ({
@@ -84,6 +96,7 @@ const UpdateWH = () => {
                 ModifyDate: item.ModifyDate,
             }));
             setRows(arr);
+            setOriginalRows(JSON.parse(JSON.stringify(arr)));
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
             alert("Đã xảy ra lỗi khi lấy dữ liệu.");
@@ -95,12 +108,22 @@ const UpdateWH = () => {
     const handleRefresh = () => {
         setRack("");
         setMaterialType("");
-        setStorageSerial("");
         setRows([]);
         setListWH([]);
         setSelectedWH(null);
-        setEditedRows([]);
+        setRackInput("")
+
     };
+
+    const handleOpenConfirm = (confirmName: string) => {
+        setCofirmType(confirmName)
+        setOpenCofirm(true)
+    }
+
+    const handleCloseConfirm = () => {
+        setCofirmType('')
+        setOpenCofirm(false)
+    }
 
     const getDataWH = async () => {
         setLoading(true);
@@ -111,8 +134,8 @@ const UpdateWH = () => {
                 value: wh,
                 title: wh,
             }));
-            setListWH(res.data
-            );
+            setListWH(res.data);
+            setSelectedWH(null)
             console.log("data", data)
             console.log("res", res.data)
 
@@ -123,57 +146,85 @@ const UpdateWH = () => {
         }
     };
 
-    const handleRowUpdate = (rowIndex: number, colName: string, value: string) => {
-        const updatedRows = [...rows];
-        console.log("new", updatedRows);
 
-        updatedRows[rowIndex][colName] = value;
 
-        // Cập nhật rows mới
-        setRows(updatedRows);
+    // const handleupdateWH = async () => {
+    //     if (rows.length > 0) {
+    //         setLoading(true)
+    //         const url = connect_string + ""
+    //         const data =
+    //         {
+    //             chxTransition: "false",
+    //             List_update: rows,
+    //             saFactory: dataUser[0].factoryName,
+    //             saVersion: dataUser[0].WareHouse,
+    //             USERID_PWA: dataUser[0].UserId,
+    //         }
+    //         console.log("data", data)
+    //         console.log("data rows", rows)
+    //         axios.post(url, data, config).then(response => {
+    //             if (response.data === true) {
+    //                 setColor(true)
+    //             }
+    //             else {
+    //                 setColor(false)
+    //             }
+    //             setOpenCofirm(false)
+    //         }).finally(() => {
+    //             setLoading(false)
+    //         })
+    //     }
 
-        // Kiểm tra nếu dòng đã thay đổi và cần thêm vào editedRows
-        const updatedRow = { ...updatedRows[rowIndex] };
-        const editedRowIndex = editedRows.findIndex((row) => row._id === updatedRow._id);
-
-        if (editedRowIndex === -1) {
-            // Thêm dòng thay đổi mới vào editedRows
-            setEditedRows((prev) => [...prev, updatedRow]);
-        } else {
-            // Cập nhật dòng đã thay đổi trong editedRows
-            setEditedRows((prev) => {
-                const newEditedRows = [...prev];
-                newEditedRows[editedRowIndex] = updatedRow;
-                return newEditedRows;
-            });
-        }
-
-        console.log("newEditedRows", updatedRows);
-    };
-
+    // };
+   
     const handleupdateWH = async () => {
-       
-        if (editedRows.length === 0) {
-            alert("Không có thay đổi nào để lưu.");
-            return;
-        }
+        console.log("row", rows)
+        console.log("originalRows", originalRows)
+        if (rows.length > 0) {
+            setLoading(true);
 
-        setDisable(true);
-        const url = connect_string + "api/update_wh";
-        try {
-            const response = await axios.post(url, { rows: editedRows }, config);
-            if (response.status === 200) {
-                alert("Cập nhật WH thành công!");
-                setEditedRows([]); // Reset lại danh sách đã thay đổi
-                await handleSearch(); // Gọi lại hàm tìm kiếm sau khi cập nhật
+            const changedRows = rows.filter((row, index) => {
+                const originalRow = originalRows[index];
+                if (!originalRow) return true;
+
+                return Object.keys(row).some((key) => {
+                    return row[key] !== originalRow[key];
+                });
+            });
+
+            if (changedRows.length === 0) {
+                alert("Không có thay đổi nào để cập nhật.");
+                setLoading(false);
+                return;
             }
-        } catch (error) {
-            console.error("Lỗi khi cập nhật WH:", error);
-            alert("Đã xảy ra lỗi khi cập nhật WH.");
-        } finally {
-            setDisable(false);
+
+            const url = connect_string + "api/update_Data_Storage"; 
+
+            const data = {
+                List_update: changedRows,
+                saFactory: dataUser[0].factoryName,
+                saVersion: dataUser[0].WareHouse,
+                USERID_PWA: dataUser[0].UserId,
+            };
+
+            try {
+                const response = await axios.post(url, data, config);
+                setColor(response.data === true);
+                if (response.data === true) {
+                    alert("Cập nhật thành công!");
+                } else {
+                    alert("Cập nhật thất bại!");
+                }
+            } catch (error) {
+                console.error("Lỗi cập nhật:", error);
+                alert("Đã xảy ra lỗi khi cập nhật.");
+            } finally {
+                setOpenCofirm(false);
+                setLoading(false);
+            }
         }
     };
+
 
 
 
@@ -188,11 +239,11 @@ const UpdateWH = () => {
             <Box paddingX={1} paddingBottom={1} className={"dark-bg-secondary border-bottom-white"}>
                 <Stack>
                     <Grid container paddingTop={"16px"} justifyContent={"center"}>
-                        <Grid item xs={1.2} display={"flex"} justifyContent={"start"} alignItems={"center"}>
+                        <Grid item xs={1} display={"flex"} justifyContent={"start"} alignItems={"center"}>
                             <Typography className="textsize">RACK</Typography>
                         </Grid>
                         <Grid item xs={2} display={"flex"} paddingRight={"16px"}>
-                            <InputField value={Rack} handle={handleRack} disable={disable} />
+                            <InputField value={RackInput} handle={handleRackInputChange} disable={disable} />
                         </Grid>
                         <Grid item xs={1.2} display={"flex"} justifyContent={"start"} alignItems={"center"}>
                             <Typography className="textsize">Material Type</Typography>
@@ -200,31 +251,30 @@ const UpdateWH = () => {
                         <Grid item xs={2} display={"flex"} paddingRight={"16px"}>
                             <InputField value={MaterialType} handle={handleMaterialType} disable={disable} />
                         </Grid>
-                        <Grid item xs={1.2} display={"flex"} justifyContent={"start"} alignItems={"center"}>
-                            <Typography className="textsize">Storage Serial</Typography>
-                        </Grid>
-                        <Grid item xs={2} display={"flex"}>
-                            <InputField value={StorageSerial} handle={handStorageSerial} disable={disable} />
-                        </Grid>
-                    </Grid>
-                    <Grid container padding={"16px"} justifyContent={"center"}>
                         <Grid item xs={0.5} display={"flex"} justifyContent={"start"} alignItems={"center"}>
                             <Typography className="textsize">WH</Typography>
                         </Grid>
                         <Grid item display={"flex"} alignItems={"center"} xs={1.5} paddingRight={"16px"}>
                             <GenericAutocomplete
-                                options={listWH}
+                                options={listWH || []}
                                 value={selectedWH}
-                                onChange={(newValue: any | null) => setSelectedWH(newValue || null)}
-                                getOptionLabel={(option) => option.title}
-                                isOptionEqualToValue={(option, value) => option.title === value?.title}
+                                onChange={(newValue: any | null) => setSelectedWH(newValue)}
+                                getOptionLabel={(option) =>
+                                    typeof option === 'string' ? option : option?.title || ''
+                                }
+                                isOptionEqualToValue={(option, value) => option.value === value?.value}
                             />
+
                         </Grid>
+
+                    </Grid>
+                    <Grid container padding={"16px"} justifyContent={"center"}>
+
                         <Grid item paddingRight={"16px"}>
                             <MyButton name={t("btnSearch")} onClick={handleSearch} disabled={disable} />
                         </Grid>
                         <Grid item paddingRight={"16px"}>
-                            <MyButton name={t("Lưu")} onClick={handleupdateWH} disabled={disable} />
+                            <MyButton name={t("Lưu")} disabled={disable} onClick={() => rows.length > 0 && handleOpenConfirm('confirm')} />
                         </Grid>
                         <Grid item>
                             <MyButton name={t("btnClean") as string} disabled={disable} onClick={handleRefresh} />
@@ -234,13 +284,11 @@ const UpdateWH = () => {
             </Box>
             <Stack overflow={"hidden"} direction="row" sx={{ height: "100%" }}>
                 <Grid sx={{ width: "100%", overflow: "hidden" }}>
-                    <EditableTableOrigin
-                        columns={columns}
-                        rows={rows}
-                        dataSelected={listWH}
-                        onRowUpdate={handleRowUpdate}
-                    />
+
+                    <TableOrigin color={color} columns={columns} rows={rows} arrNotShowCell={[]} handleDoubleClick={null} handlerowClick={null} dataSelected={listWH} />
+
                 </Grid>
+                {cofirmType === 'confirm' && <ModalCofirm onPressOK={handleupdateWH} open={openCofirm} onClose={handleCloseConfirm} title={t("msgYouWantUpdate") as string} />}
             </Stack>
         </FullScreenContainerWithNavBar>
     );

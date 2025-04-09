@@ -1,8 +1,7 @@
-/** @format */
-
-import { Autocomplete, TextField } from '@mui/material';
-import { t } from 'i18next';
 import React from 'react';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import { t } from 'i18next';
 
 type GenericAutocompleteProps<T> = {
 	options: T[];
@@ -14,8 +13,18 @@ type GenericAutocompleteProps<T> = {
 	disabled?: boolean;
 	allowFreeSolo?: boolean;
 };
-function GenericAutocomplete<T extends object | string>({ options, value, onChange, onInputChange, getOptionLabel, isOptionEqualToValue, disabled = false, allowFreeSolo = false }: GenericAutocompleteProps<T>){
-  return (
+
+function GenericAutocomplete<T extends object | string>({
+	options,
+	value,
+	onChange,
+	onInputChange,
+	getOptionLabel,
+	isOptionEqualToValue,
+	disabled = false,
+	allowFreeSolo = false,
+}: GenericAutocompleteProps<T>) {
+	return (
 		<Autocomplete
 			value={value}
 			onChange={(event, newValue) => {
@@ -30,21 +39,23 @@ function GenericAutocomplete<T extends object | string>({ options, value, onChan
 					onChange(newInputValue as T);
 				}
 			}}
-			noOptionsText={t('lblNoOption') as string}
+			noOptionsText={t("lblNoOption") as string}
 			freeSolo={allowFreeSolo}
 			disablePortal
 			options={options}
 			getOptionLabel={(option) => getOptionLabel(option)}
-			isOptionEqualToValue={(option, currentValue) => (isOptionEqualToValue ? isOptionEqualToValue(option, currentValue) : option === currentValue)}
+			isOptionEqualToValue={(option, currentValue) =>
+				isOptionEqualToValue
+					? isOptionEqualToValue(option, currentValue)
+					: option === currentValue
+			}
 			renderOption={(props, option) => {
-				let color = 'white';
+				let color = "white";
 				if (option && (option as any)?.check === true) {
-					color = 'grey';
+					color = "grey";
 				}
 				return (
-					<li
-						{...props}
-						style={{ color }}>
+					<li {...props} style={{ color }}>
 						{getOptionLabel(option)}
 					</li>
 				);
@@ -70,6 +81,7 @@ function GenericAutocomplete<T extends object | string>({ options, value, onChan
 				popper: {
 					sx: {
 						'& .MuiAutocomplete-listbox': {
+
 							'@media screen and (max-width: 1200px)': {
 								fontSize: '14px !important',
 							},
@@ -83,7 +95,7 @@ function GenericAutocomplete<T extends object | string>({ options, value, onChan
 			renderInput={(params) => (
 				<TextField
 					{...params}
-					className='dark-bg-primary'
+					className="dark-bg-primary"
 					sx={{
 						borderRadius: '50px',
 						height: '1.9rem !important',

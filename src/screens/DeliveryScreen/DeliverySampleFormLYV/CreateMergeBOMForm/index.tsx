@@ -446,7 +446,7 @@ const CreateMergeBom = (props: CreateMergeBomProps) => {
             const data = {
                 Merge_No: itemRow?.YPZLBH,
                 // user mayin sẽ in tem thông tin kho mẫu
-                UserID: "mayin"
+                UserID: "65519"
             }
             const url = connect_string + "api/PrintLabel_Delivery_Sample_CLick_Standard_ALL"
 

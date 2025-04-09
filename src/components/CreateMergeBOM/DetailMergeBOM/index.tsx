@@ -1,5 +1,5 @@
 import { Box, Grid, IconButton, Modal, Stack, Typography } from '@mui/material';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { BiArrowBack } from 'react-icons/bi';
 import InputFieldV1 from '../../InputField/index_new';
@@ -196,7 +196,12 @@ const index = (props: DetailMergeBOMProps) => {
         value: "all",
         title: t("chxAll")
     })
-
+    useEffect(() => {
+        if (open) {
+            setDataWaiting([])
+            getDataWaiting(item);
+        }
+    }, [])
     const handleOnChangeMaterialNo = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         setMaterialNo(value)
@@ -267,7 +272,7 @@ const index = (props: DetailMergeBOMProps) => {
     }
 
     const handlePrint = async () => {
-        if (await checkPermissionPrint("mayin")) {
+        if (await checkPermissionPrint("65519")) {
             console.log("checkPermissionPrint", listChx)
             if (listChx.length > 0) {
                 handleOpenConfirm("print")
@@ -297,7 +302,7 @@ const index = (props: DetailMergeBOMProps) => {
             const data = {
                 list_Prints: list_Prints,
                 // user mayin sẽ in tem thông tin kho mẫu
-                UserID: "mayin"
+                UserID: "65519"
             }
             const url = connect_string + "api/PrintLabel_Delivery_Sample_CLick_Standard"
 
