@@ -456,7 +456,9 @@
     "msgNoCreate": "Bạn phải tạo phiếu xuất cho PO hoặc trả lại hết vật tư để tạo BOM",
     "btnGuide": "Hướng dẫn",
     "msgStockOut": "Bạn có chắc chắn muốn xuất vật tư?",
-    "lblupdate_inforWH": "Cập nhật thông tin WH"
+    "lblupdate_inforWH": "Cập nhật thông tin WH",
+    "msgerror": "Cập nhật thất bại!",
+    "msgNochange": "Không có thay đổi nào để cập nhật"
   
 
 }

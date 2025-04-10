@@ -454,6 +454,8 @@
     "msgNoCreate": "您必须为PO创建出库单，或退回所有物料以创建BOM。",
     "btnGuide": "指南",
     "msgStockOut": "您确定要导出物料吗？",
-    "lblupdate_inforWH": "更新仓库信息"
+    "lblupdate_inforWH": "更新仓库信息",
+    "msgerror": "更新失败！",
+    "msgNochange": "没有任何更改需要更新"
 
 }

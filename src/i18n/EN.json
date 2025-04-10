@@ -456,6 +456,8 @@
     "msgNoCreate": "You must create an export slip for the PO or return all materials to create the BOM.",
     "btnGuide": "Guidance",
     "msgStockOut": "Are you sure you want to export the materials?",
-    "lblupdate_inforWH": "Update Warehouse Information"
+    "lblupdate_inforWH": "Update Warehouse Information",
+    "msgerror": "Update failed!!",
+    "msgNochange": "There are no changes to update."
 
 }
